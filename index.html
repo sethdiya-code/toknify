@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TOKNIFY</title>
+</head>
+<body>
+
+<h1>TOKNIFY SYSTEM</h1>
+
+<h2>Current Token: {{ current_token }}</h2>
+
+<form action="/add" method="post">
+    <input type="text" name="name" placeholder="Enter Name" required>
+    <input type="text" name="phone" placeholder="Enter Phone" required>
+    <button type="submit">Add Patient</button>
+</form>
+
+<br>
+
+<a href="/next">
+    <button>Next Token</button>
+</a>
+
+<h3>Patients List:</h3>
+
+<ul>
+{% for p in patients %}
+    <li>
+        Token {{ p.token }} - {{ p.name }} ({{ p.phone }})
+    </li>
+{% endfor %}
+</ul>
+
+</body>
+</html>
