@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Token System</title>
+</head>
+<body>
+
+<h2>Current Token: {{ token }}</h2>
+
+<form method="POST" action="/add">
+    <input type="text" name="name" placeholder="Patient Name" required>
+    <input type="text" name="phone" placeholder="Phone Number" required>
+    <button type="submit">Add Patient</button>
+</form>
+
+<br>
+
+<h3>Patients List:</h3>
+<ul>
+{% for p in patients %}
+
+<li>
+    {{ p.name }} - Token {{ p.token }}
+    <a href="/delete/{{ p.token }}">❌</a>
+</li>
+
+{% endfor %}
+</ul>
+
+</body>
+</html>
