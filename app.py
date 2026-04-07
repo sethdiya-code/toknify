@@ -28,13 +28,13 @@ def next_token():
     global current_token
     current_token += 1
     return redirect('/')
-    
-@app.route('/delete/<int:token>')
+
+@app.route('/delete/<token>')
 def delete_patient(token):
     global patients
-    patients = [p for p in patients if p['token'] != token]
+    patients = [p for p in patients if str(p['token']) != str(token)]
     return redirect('/')
-
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
