@@ -31,7 +31,7 @@
 
 <script>
     function callNext() {
-        fetch("https://toknify.onrender.com/next")
+        fetch("/next")
             .then(res => res.text())
             .then(data => {
                 alert("Call triggered");
