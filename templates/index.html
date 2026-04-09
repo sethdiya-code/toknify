@@ -14,7 +14,9 @@
 </form>
 
 <br>
-
+    
+<button onclick="callNext()">Next</button>
+    
 <h3>Patients List:</h3>
 <ul>
 {% for p in patients %}
@@ -26,6 +28,20 @@
 
 {% endfor %}
 </ul>
+
+<script>
+    function callNext() {
+        fetch("https://toknify-backend.onrender.com/next")
+            .then(res => res.text())
+            .then(data => {
+                alert("Call triggered");
+            })
+            .catch(err => {
+                alert("Error: " + err);
+            });
+
+}
+</script> 
 
 </body>
 </html>
