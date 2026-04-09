@@ -27,6 +27,27 @@ def add_patient():
 def next_token():
     global current_token
     current_token += 1
+    
+    account_sid = "AC4b852228ce7c63a80942080ad72c30a5"
+    auth_token = "551694d10b5ff7bbc38336ba3db0554f "
+    client = Client(account_sid, auth_token)
+
+    try:
+    
+        if current_token <= len(patients):
+            phone = patients[current_token - 1]['phone']
+
+            call = client.calls.create(
+                url="http://demo.twilio.com/docs/voice.xml",
+                to=phone,
+                from_="+17625258609"
+            )
+
+            print("CALL SID:", call.sid)
+
+    except Exception as e:
+        print("ERROR:", str(e))
+
     return redirect('/')
 
 @app.route('/delete/<token>')
