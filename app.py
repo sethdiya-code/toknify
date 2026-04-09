@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect
-from twilio.rest import client
+from twilio.rest import Client
 
 app = Flask(__name__)
 
