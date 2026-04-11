@@ -39,7 +39,7 @@ def next_token():
     current_token += 1
 
     account_sid = "AC4b852228ce7c63a80942080ad72c30a5 "
-    auth_token = "89ab4454e9e775a8a2a1e0f0b492a7f4"
+    auth_token = "d59779116cf71a9a74b53956fec052fd"
 
     client = Client(account_sid, auth_token)
 
@@ -62,7 +62,7 @@ def next_token():
             print("No patient left")
 
     except Exception as e:
-        print("💥 ERROR:", str(e))
+        print("ERROR:", str(e))
 
     return redirect('/')
 
