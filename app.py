@@ -39,7 +39,7 @@ def next_token():
     current_token += 1
 
     account_sid = "AC4b852228ce7c63a80942080ad72c30a5 "
-    auth_token = "d59779116cf71a9a74b53956fec052fd"
+    auth_token = "daba2ec69e4ca4828c8bce847f67718c"
 
     client = Client(account_sid, auth_token)
 
