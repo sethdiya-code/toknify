@@ -14,10 +14,14 @@ def index():
 
 @app.route('/add', methods=['POST'])
 def add_patient():
+    global current_token
+
+    current_token=0
+    
     name = request.form['name']
     phone = request.form['phone']
 
-    # ensure +91 format
+    
     if not phone.startswith('+'):
         phone = '+91' + phone
 
@@ -36,7 +40,6 @@ def add_patient():
 def next_token():
     global current_token
 
-    current_token += 1
 
     account_sid = "AC4b852228ce7c63a80942080ad72c30a5 "
     auth_token = "daba2ec69e4ca4828c8bce847f67718c"
@@ -47,7 +50,7 @@ def next_token():
 
     try:
         if current_token <= len(patients):
-            phone = patients[current_token - 1]['phone']
+            phone = patients[current_token]['phone']
             print("Calling:", phone)
 
             call = client.calls.create(
@@ -57,6 +60,8 @@ def next_token():
             )
 
             print("CALL SID:", call.sid)
+
+            current_token+=1
 
         else:
             print("No patient left")
