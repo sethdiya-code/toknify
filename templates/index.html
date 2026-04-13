@@ -15,7 +15,7 @@
 
 <br>
     
-<button onclick="callNext()">Next</button>
+
     
 <h3>Patients List:</h3>
 <ul>
@@ -30,19 +30,6 @@
 {% endfor %}
 </ul>
 
-<script>
-    function callNext() {
-        fetch("/next")
-            .then(res => res.text())
-            .then(data => {
-                alert("Call triggered");
-            })
-            .catch(err => {
-                alert("Error: " + err);
-            });
-
-}
-</script> 
 
 </body>
 </html>
