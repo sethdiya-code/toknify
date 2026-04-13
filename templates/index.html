@@ -3,36 +3,51 @@
 <head>
     <title>Token System</title>
 </head>
+
 <body>
 
-<h2>Current Token: {{ current_token }}</h2>
-
-<form method="POST" action="/add">
-    <input type="text" name="name" placeholder="Patient Name" required>
-    <input type="text" name="phone" placeholder="Phone Number" required>
-    <button type="submit">Add Patient</button>
-</form>
-
-<br>
-    
+    <h1>Current Token: {{ current_token }}</h1>
 
     
-<h3>Patients List:</h3>
+    <form action="/add" method="POST">
+        <input type="text" name="name" placeholder="Patient Name" required>
+        <input type="text" name="phone" placeholder="Phone Number" required>
+        <button type="submit">Add Patient</button>
+    </form>
 
-<ul>
-{% for p in patients %}
-<li>
-    {% if p.token == current_token %}
-        <b style="color: red;"> {{ p.name }} - Token {{ p.token }}</b>
-    {% else %}
-        {{ p.name }} - Token {{ p.token }}
-    {% endif %}
+    <br>
 
-    <a href="/call/{{ p.token }}">Call Now</a>
-    <a href="/delete/{{ p.token }}">Remove</a>
-</li>
-{% endfor %}
-</ul>
+    
+    <button onclick="autoCall()">Auto Call Next</button>
+
+    <br><br>
+
+    
+    <h2>Patients List:</h2>
+
+    <ul>
+        {% for p in patients %}
+        <li>
+            {{ p.name }} - Token {{ p.token }}
+
+            
+            <a href="/call/{{ p.token }}">Call Now</a>
+
+           
+            <a href="/delete/{{ p.token }}">Remove</a>
+        </li>
+        {% endfor %}
+    </ul>
+
+   
+    <script>
+        function autoCall() {
+            fetch("/auto_call")
+                .then(() => {
+                    location.reload(); 
+                });
+        }
+    </script>
 
 </body>
 </html>
