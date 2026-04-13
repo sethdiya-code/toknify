@@ -46,6 +46,8 @@
             .then(() => {
                 location.reload(); 
             });
+            .catch(err=>{
+                console.log("Erorr:",err);
     }
     
     setInterval(() => {
@@ -53,7 +55,10 @@
             .then(()=>{
                 location.reload();
             })
-        }, 20000);
+            .catch(err=>{
+                console.log("Error:",err);
+            });
+        }, 30000);
         </script>
     
 </body>
