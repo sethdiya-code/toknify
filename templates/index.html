@@ -41,13 +41,20 @@
 
    
     <script>
-        function autoCall() {
-            fetch("/auto_call")
-                .then(() => {
-                    location.reload(); 
-                });
-        }
-    </script>
-
+    function autoCall() {
+        fetch("/auto_call")
+            .then(() => {
+                location.reload(); 
+            });
+    }
+    
+    setInterval(() => {
+        fetch("/auto_call")
+            .then(()=>{
+                location.reload();
+            })
+        }, 20000);
+        </script>
+    
 </body>
 </html>
