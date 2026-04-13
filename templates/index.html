@@ -41,16 +41,10 @@
 
    
     <script>
-    function autoCall() {
-        fetch("/auto_call")
-            .then(() => {
-                location.reload(); 
-            });
-            .catch(err=>{
-                console.log("Erorr:",err);
-    }
     
     setInterval(() => {
+        console.log("AUTO CALL RUNNING...");
+        
         fetch("/auto_call")
             .then(()=>{
                 location.reload();
@@ -58,7 +52,7 @@
             .catch(err=>{
                 console.log("Error:",err);
             });
-        }, 30000);
+        }, 20000);
         </script>
     
 </body>
