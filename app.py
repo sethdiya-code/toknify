@@ -56,6 +56,7 @@ def make_call(phone, message):
 def next_token():
     global current_token
     current_token += 1
+    return redirect ('/')
 
     print("FUNCTION RUN HUA")
 
