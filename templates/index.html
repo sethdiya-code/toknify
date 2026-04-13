@@ -18,18 +18,21 @@
 
     
 <h3>Patients List:</h3>
+
 <ul>
 {% for p in patients %}
-
 <li>
-    {{ p.name }} - Token {{ p.token }}
-     <a href="/call/{{ p.token }}">Call Now</a>
-     <a href="/delete/{{ p.token }}">Remove</a>
-</li>
+    {% if p.token == current_token %}
+        <b style="color: red;"> {{ p.name }} - Token {{ p.token }}</b>
+    {% else %}
+        {{ p.name }} - Token {{ p.token }}
+    {% endif %}
 
+    <a href="/call/{{ p.token }}">Call Now</a>
+    <a href="/delete/{{ p.token }}">Remove</a>
+</li>
 {% endfor %}
 </ul>
-
 
 </body>
 </html>
