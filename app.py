@@ -39,7 +39,7 @@ def add_patient():
         'token': len(patient)+1,
         'called':False,
         'retry':0,
-        'last_called_time:0'
+        'last_called_time':0
     })
 
     return redirect('/')
