@@ -8,7 +8,7 @@
 
 <h1>Current Token: {{ current_token }}</h1>
 
-<!-- ADD PATIENT -->
+<!-- ➕ ADD PATIENT -->
 <form action="/add" method="POST">
     <input type="text" name="name" placeholder="Patient Name" required>
     <input type="text" name="phone" placeholder="Phone Number" required>
@@ -17,8 +17,9 @@
 
 <br>
 
-<!-- START AUTO SYSTEM -->
-<button onclick="startAuto()">Start Auto Call</button>
+<!-- 🚀 CONTROL BUTTONS -->
+<button onclick="startAuto()">🚀 Start Auto Call</button>
+<button onclick="stopAuto()">⛔ Stop</button>
 
 <br><br>
 
@@ -26,43 +27,34 @@
 
 <ul>
 {% for p in patients %}
-    <li>
-        {{ p.name }} - Token {{ p.token }}
+<li>
+    {{ p.name }} - Token {{ p.token }}
 
-        <a href="/call/{{ p.token }}">Call Now</a>
-
-        <a href="/delete/{{ p.token }}">Remove</a>
-    </li>
+    <a href="/call/{{ p.token }}">📞 Call Now</a>
+    <a href="/delete/{{ p.token }}">❌ Remove</a>
+</li>
 {% endfor %}
 </ul>
 
-<!-- 🔥 AUTO CALL + RETRY JS -->
+<!-- 🔥 AUTO SYSTEM SCRIPT -->
 <script>
-
-let autoRunning = false;
-
 function startAuto() {
-    autoRunning = true;
-    console.log("AUTO SYSTEM STARTED 🔥");
+    fetch("/start_auto");
 }
 
-// har 20 sec me auto_call chalega
+function stopAuto() {
+    fetch("/stop_auto");
+}
+
 setInterval(() => {
-
-    if (!autoRunning) return;
-
-    console.log("AUTO CALL RUNNING...");
-
     fetch("/auto_call")
-    .then(() => {
-        location.reload();
-    })
-    .catch(err => {
-        console.log("Error:", err);
-    });
-
-}, 20000);
-
+        .then(() => {
+            location.reload();
+        })
+        .catch(err => {
+            console.log("Error:", err);
+        });
+}, 5000);  // 🔥 fast check (retry backend handle karega)
 </script>
 
 </body>
