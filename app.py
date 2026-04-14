@@ -36,7 +36,7 @@ def add_patient():
     patients.append({
         'name': name,
         'phone': phone,
-        'token': len(patient)+1,
+        'token': len(patients)+1,
         'called':False,
         'retry':0,
         'last_called_time':0
