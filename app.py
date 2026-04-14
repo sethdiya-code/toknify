@@ -135,7 +135,7 @@ def auto_call():
 
         # 🔁 RETRY (same patient only)
         if p["token"] == current_token:
-            if p["retry"] < 2 and (now - p["last_called_time"] > 20):
+            if p["retry"] < 1 and (now - p["last_called_time"] > 50):
 
                 make_call(p["phone"], p["name"])
 
