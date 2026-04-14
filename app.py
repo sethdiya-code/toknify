@@ -120,21 +120,17 @@ def auto_call():
 
     now = time.time()
 
-    #find current patient
-    current_patient= None
-    next_patient= None
-
+    # 👉 current patient find
+    current_patient = None
     for p in patients:
-
-        # 🔥 FIRST CALL (next patient)
         if p["token"] == current_token:
-            current_patient= p
-        if p["token"]==current_token+ 1:
-            next_patient= p
+            current_patient = p
+            break
 
-        
-    # 🔁 STEP 1: retry current patient
+    # 🔁 STEP 1: agar current patient hai → usko complete karo
     if current_patient:
+
+        # 👉 retry agar baaki hai
         if current_patient["retry"] < 1:
             if now - current_patient["last_called_time"] > 50:
 
@@ -146,20 +142,28 @@ def auto_call():
                 print("RETRY:", current_patient["name"])
                 return "retry"
 
-    # 👉 STEP 2: next patient call
-    if next_patient and not next_patient["called"]:
+            # ⛔ wait karo jab tak 50 sec complete na ho
+            return "waiting"
 
-        make_call(next_patient["phone"], next_patient["name"])
+        # 👉 retry ho gaya → ab next pe ja sakte
+        else:
+            current_token += 1
+            return "move_next"
 
-        current_token = next_patient["token"]
-        next_patient["called"] = True
-        next_patient["last_called_time"] = now
+    # 👉 STEP 2: next patient call (FIRST CALL)
+    for p in patients:
+        if p["token"] == current_token + 1:
 
-        print("FIRST CALL:", next_patient["name"])
-        return "called"
+            make_call(p["phone"], p["name"])
+
+            current_token = p["token"]
+            p["called"] = True
+            p["last_called_time"] = now
+
+            print("FIRST CALL:", p["name"])
+            return "called"
 
     return "done"
-
        
 # ❌ DELETE
 @app.route('/delete/<int:token>')
