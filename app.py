@@ -1,11 +1,13 @@
 from flask import Flask, render_template, request, redirect
 from twilio.rest import Client
 import os
+import time
 
 app = Flask(__name__)
 
 patients = []
 current_token = 0
+auto_running=False
 
 TWILIO_NUMBER = "+17625258609"
 
@@ -34,7 +36,10 @@ def add_patient():
     patients.append({
         'name': name,
         'phone': phone,
-        'token': token
+        'token': len(patient)+1,
+        'called':False,
+        'retry':0,
+        'last_called_time:0'
     })
 
     return redirect('/')
@@ -60,36 +65,57 @@ def make_call(phone, name):
         print("CALL ERROR:", str(e))
 
 
+@app.route('/start_auto')
+def start_auto():
+    global auto_running
+    auto_running=True
+    print("AUTO STARTED")
+    return "started"
+    
+
+@app.route('/stop_auto')
+def stop_auto():
+    global auto_running
+    auto_running=False
+    print("AUTO STOPPED")
+    return "stopped"
+
 
 @app.route('/auto_call')
 def auto_call():
-    global current_token
+    global current_token, auto_running
 
-    if current_token < len(patients):
-        current_token += 1
+    if not auto_running:
+        return "stopped"
 
-        p = patients[current_token - 1]
+    now= time.time()
 
-        make_call(p['phone'], p['name'])
+    for p in patients:
+
+        if p["token"] == current_token + 1 and not p["called"]:
+            make_call(p["phone"], p["name"])
+
+            current_token = p["token"]
+            p["called"] = True
+            p["last_called_time"] = now
+
+            print("FIRST CALL:", p["phone"])
+            return "called"
+
+     
+        if p["called"] and p["retry"] < 2:
+            if now - p["last_called_time"] > 20:  
+                make_call(p["phone"], p["name"])
+
+                p["retry"] += 1
+                p["last_called_time"] = now
+
+                print("RETRY:", p["phone"])
+                return "retry"
 
     return "done"
 
-
-
-@app.route('/call/<int:token>')
-def call_patient(token):
-    global current_token
-
-    for p in patients:
-        if p['token'] == token:
-            current_token = token
-            make_call(p['phone'], p['name'])
-            break
-
-    return redirect('/')
-
-
-
+   
 @app.route('/delete/<int:token>')
 def delete_patient(token):
     global patients
