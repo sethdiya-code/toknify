@@ -47,6 +47,8 @@ def add_patient():
         'last_called_time': 0
     })
 
+    print("ADDED:", name, token)
+
     return redirect('/')
 
 
