@@ -44,6 +44,19 @@ def add_patient():
 
     return redirect('/')
 
+@app.route('/call/<int:token>')
+def call_patient(token):
+    global current_token
+
+    for p in patients:
+        if p["token"] == token:
+            print("📞 Calling:", p["name"])
+
+            current_token = token
+
+            return redirect('/')
+
+    return "Patient not found"
 
 
 def make_call(phone, name):
