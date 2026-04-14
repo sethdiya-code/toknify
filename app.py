@@ -9,6 +9,7 @@ app = Flask(__name__)
 patients = []
 current_token = 0
 auto_running = False
+next_token= 1
 
 TWILIO_NUMBER = "+17625258609"
 
@@ -26,14 +27,16 @@ def index():
 # ➕ ADD PATIENT
 @app.route('/add', methods=['POST'])
 def add_patient():
+    global next_token
+    
     name = request.form['name']
     phone = request.form['phone']
 
     if not phone.startswith('+'):
         phone = '+91' + phone
 
-    token=next_token
-    next_token+=1
+    token= next_token
+    next_token+= 1
 
     patients.append({
         'name': name,
