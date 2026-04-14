@@ -38,24 +38,35 @@
 
 <!-- 🔥 AUTO SYSTEM SCRIPT -->
 <script>
+let autoRunning = false;
+
 function startAuto() {
+    autoRunning = true;
     fetch("/start_auto");
+    console.log("AUTO STARTED");
 }
 
 function stopAuto() {
+    autoRunning = false;
     fetch("/stop_auto");
+    console.log("AUTO STOPPED");
 }
 
 setInterval(() => {
+    if (!autoRunning) return;
+
     fetch("/auto_call")
-        .then(() => {
-            location.reload();
+        .then(res => res.text())
+        .then(data => {
+            console.log("AUTO:", data);
+            // ❌ page reload hata diya
         })
         .catch(err => {
             console.log("Error:", err);
         });
-}, 5000);  // 🔥 fast check (retry backend handle karega)
-</script>
 
+}, 10000);
+</script>
+    
 </body>
 </html>
