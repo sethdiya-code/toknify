@@ -32,7 +32,8 @@ def add_patient():
     if not phone.startswith('+'):
         phone = '+91' + phone
 
-    token = len(patients) + 1
+    token=next_token
+    next_token+=1
 
     patients.append({
         'name': name,
