@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, request, redirect
 from twilio.rest import Client
 import os
@@ -7,12 +8,12 @@ app = Flask(__name__)
 
 patients = []
 current_token = 0
-auto_running=False
+auto_running = False
 
 TWILIO_NUMBER = "+17625258609"
 
 
-
+# 🏠 HOME
 @app.route('/')
 def index():
     return render_template(
@@ -22,7 +23,7 @@ def index():
     )
 
 
-
+# ➕ ADD PATIENT
 @app.route('/add', methods=['POST'])
 def add_patient():
     name = request.form['name']
@@ -36,29 +37,16 @@ def add_patient():
     patients.append({
         'name': name,
         'phone': phone,
-        'token': len(patients)+1,
-        'called':False,
-        'retry':0,
-        'last_called_time':0
+        'token': token,
+        'called': False,
+        'retry': 0,
+        'last_called_time': 0
     })
 
     return redirect('/')
 
-@app.route('/call/<int:token>')
-def call_patient(token):
-    global current_token
 
-    for p in patients:
-        if p["token"] == token:
-            print("📞 Calling:", p["name"])
-
-            current_token = token
-
-            return redirect('/')
-
-    return "Patient not found"
-
-
+# 📞 CALL FUNCTION (REAL CALL)
 def make_call(phone, name):
     try:
         client = Client(
@@ -72,28 +60,51 @@ def make_call(phone, name):
             from_=TWILIO_NUMBER
         )
 
-        print("CALL SUCCESS:", phone)
+        print("📞 CALL:", phone)
 
     except Exception as e:
-        print("CALL ERROR:", str(e))
+        print("ERROR:", str(e))
 
 
+# 📞 MANUAL CALL
+@app.route('/call/<int:token>')
+def call_patient(token):
+    global current_token
+
+    for p in patients:
+        if p["token"] == token:
+
+            current_token = token
+
+            make_call(p["phone"], p["name"])   # 🔥 FIX
+
+            p["called"] = True
+            p["last_called_time"] = time.time()
+
+            return redirect('/')
+
+    return "Patient not found"
+
+
+# 🚀 START AUTO
 @app.route('/start_auto')
 def start_auto():
     global auto_running
-    auto_running=True
+    auto_running = True
     print("AUTO STARTED")
     return "started"
-    
 
+
+# ⛔ STOP AUTO
 @app.route('/stop_auto')
 def stop_auto():
     global auto_running
-    auto_running=False
+    auto_running = False
     print("AUTO STOPPED")
     return "stopped"
 
 
+# 🤖 AUTO + RETRY SYSTEM
 @app.route('/auto_call')
 def auto_call():
     global current_token, auto_running
@@ -101,10 +112,11 @@ def auto_call():
     if not auto_running:
         return "stopped"
 
-    now= time.time()
+    now = time.time()
 
     for p in patients:
 
+        # 🔥 FIRST CALL (next patient)
         if p["token"] == current_token + 1 and not p["called"]:
             make_call(p["phone"], p["name"])
 
@@ -112,23 +124,25 @@ def auto_call():
             p["called"] = True
             p["last_called_time"] = now
 
-            print("FIRST CALL:", p["phone"])
+            print("FIRST CALL:", p["name"])
             return "called"
 
-     
-        if p["called"] and p["retry"] < 2:
-            if now - p["last_called_time"] > 20:  
+        # 🔁 RETRY (same patient only)
+        if p["token"] == current_token:
+            if p["retry"] < 2 and (now - p["last_called_time"] > 20):
+
                 make_call(p["phone"], p["name"])
 
                 p["retry"] += 1
                 p["last_called_time"] = now
 
-                print("RETRY:", p["phone"])
+                print("RETRY:", p["name"])
                 return "retry"
 
     return "done"
 
-   
+
+# ❌ DELETE
 @app.route('/delete/<int:token>')
 def delete_patient(token):
     global patients
