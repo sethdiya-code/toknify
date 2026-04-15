@@ -173,7 +173,7 @@ def delete_patient(token):
         patients = [p for p in patients if int(p['token']) != int (token)]
 
     #RESET LOGIC
-    if len (patient)== 0:
+    if len (patients)== 0:
         current_token= 0
 
     print("DELETED TOKEN:", token)
