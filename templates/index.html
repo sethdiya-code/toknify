@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,7 +8,7 @@
 
 <h1>Current Token: {{ current_token }}</h1>
 
-<!-- 🔥 ADD PATIENT -->
+<!-- ✅ ADD PATIENT -->
 <form action="/add" method="POST">
     <input type="text" name="name" placeholder="Patient Name" required>
     <input type="text" name="phone" placeholder="Phone Number" required>
@@ -16,25 +17,48 @@
 
 <br>
 
-<!-- 🔥 AUTO CONTROL -->
+<!-- ✅ AUTO CONTROL -->
 <a href="/start"><button>Start Auto Call</button></a>
 <a href="/stop"><button>Stop</button></a>
 
 <br><br>
 
-<!-- 🔥 CALL BEFORE SETTING -->
+<!-- ✅ CALL BEFORE SETTING -->
 <h3>Call Before Tokens:</h3>
 
-<button onclick="setCall(1)">1</button>
-<button onclick="setCall(2)">2</button>
-<button onclick="setCall(3)">3</button>
-<button onclick="setCall(4)">4</button>
+<button onclick="setCall(1)"
+style="padding:8px 15px; border:none; border-radius:5px;
+background:{% if call_before == 1 %}green{% else %}lightgray{% endif %};
+color:white;">
+1
+</button>
+
+<button onclick="setCall(2)"
+style="padding:8px 15px; border:none; border-radius:5px;
+background:{% if call_before == 2 %}green{% else %}lightgray{% endif %};
+color:white;">
+2
+</button>
+
+<button onclick="setCall(3)"
+style="padding:8px 15px; border:none; border-radius:5px;
+background:{% if call_before == 3 %}green{% else %}lightgray{% endif %};
+color:white;">
+3
+</button>
+
+<button onclick="setCall(4)"
+style="padding:8px 15px; border:none; border-radius:5px;
+background:{% if call_before == 4 %}green{% else %}lightgray{% endif %};
+color:white;">
+4
+</button>
 
 <p><b>Current:</b> {{ call_before }} tokens before</p>
 
 <hr>
 
-<!-- 🔥 PATIENT LIST -->
+<!-- ✅ PATIENT LIST -->
 <h2>Patients List:</h2>
 
 <ul>
@@ -43,17 +67,18 @@
     {{ p.name }} - Token {{ p.token }}
 
     <!-- 📞 CALL NOW -->
-    <button onclick="callNow({{ p.token }})">
-        📞 Call Now
+    <button onclick="callNow({{ p.token }})"
+    style="margin-left:10px; background:green; color:white; border:none; padding:5px 10px; border-radius:5px;">
+    📞 Call Now
     </button>
 
     <!-- ❌ DELETE -->
-    <a href="/delete/{{ p.token }}">❌ Remove</a>
+    <a href="/delete/{{ p.token }}" style="margin-left:10px;">❌ Remove</a>
 </li>
 {% endfor %}
 </ul>
 
-<!-- 🔥 JS -->
+<!-- ✅ JS -->
 <script>
 function setCall(value) {
     fetch(`/set_call_before/${value}`)
