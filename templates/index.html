@@ -5,118 +5,178 @@
 
     <style>
         body {
-            font-family: Arial;
+            font-family: 'Segoe UI', sans-serif;
+            background: #f5f7fb;
             padding: 20px;
         }
 
+        h1 {
+            color: #222;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
         input {
-            padding: 8px;
+            padding: 10px;
             margin: 5px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
         }
 
         button {
-            padding: 8px 12px;
-            margin: 5px;
-            border-radius: 6px;
+            padding: 10px 16px;
             border: none;
+            border-radius: 8px;
             cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-green {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-red {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-blue {
+            background: #007bff;
+            color: white;
+        }
+
+        .token-btn {
+            background: #ddd;
         }
 
         .active {
-            background-color: green;
+            background: #28a745;
             color: white;
         }
 
-        .call-btn {
-            background-color: green;
-            color: white;
+        .patient {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
         }
 
-        .remove-btn {
-            color: red;
-            text-decoration: none;
-            margin-left: 10px;
+        .status {
+            font-size: 14px;
+            padding: 4px 10px;
+            border-radius: 20px;
         }
+
+        .waiting { background: #ffeeba; }
+        .calling { background: #cce5ff; }
+        .retry { background: #f8d7da; }
+        .done { background: #d4edda; }
+
     </style>
 
     <script>
         function setCallBefore(value) {
             fetch('/set_call_before/' + value)
-            .then(() => {
-                location.reload();
-            });
+            .then(() => location.reload());
         }
-    </script>
 
+        setInterval(() => {
+            fetch('/auto_call');
+        }, 5000);
+    </script>
 </head>
 
 <body>
 
-    <h1>Current Token: {{ current_token }}</h1>
+    <h1>📞 Toknify Dashboard</h1>
 
     <!-- ADD PATIENT -->
-    <form action="/add" method="POST">
-        <input type="text" name="name" placeholder="Patient Name" required>
-        <input type="text" name="phone" placeholder="Phone Number" required>
-        <button type="submit">Add Patient</button>
-    </form>
+    <div class="card">
+        <h3>Add Patient</h3>
 
-    <!-- AUTO CALL -->
-    <button onclick="startAuto()">Start Auto Call</button>
-    <button onclick="stopAuto()">Stop</button>
+        <form action="/add" method="POST">
+            <input type="text" name="name" placeholder="Patient Name" required>
+            <input type="text" name="phone" placeholder="Phone Number" required>
+            <button type="submit" class="btn-blue">Add</button>
+        </form>
+    </div>
+
+    <!-- AUTO -->
+    <div class="card">
+        <h3>Auto Call Control</h3>
+
+        <a href="/start_auto"><button class="btn-green">Start Auto</button></a>
+        <a href="/stop_auto"><button class="btn-red">Stop</button></a>
+    </div>
 
     <!-- CALL BEFORE -->
-    <h3>Call Before Tokens:</h3>
+    <div class="card">
+        <h3>Call Before Tokens</h3>
 
-    <button onclick="setCallBefore(1)" class="{{ 'active' if call_before==1 else '' }}">1</button>
-    <button onclick="setCallBefore(2)" class="{{ 'active' if call_before==2 else '' }}">2</button>
-    <button onclick="setCallBefore(3)" class="{{ 'active' if call_before==3 else '' }}">3</button>
-    <button onclick="setCallBefore(4)" class="{{ 'active' if call_before==4 else '' }}">4</button>
+        <button onclick="setCallBefore(1)" class="token-btn {{ 'active' if call_before==1 else '' }}">1</button>
+        <button onclick="setCallBefore(2)" class="token-btn {{ 'active' if call_before==2 else '' }}">2</button>
+        <button onclick="setCallBefore(3)" class="token-btn {{ 'active' if call_before==3 else '' }}">3</button>
+        <button onclick="setCallBefore(4)" class="token-btn {{ 'active' if call_before==4 else '' }}">4</button>
 
-    <p><b>Current:</b> {{ call_before }} tokens before</p>
+        <p>Current: {{ call_before }} tokens before</p>
+    </div>
 
-    <hr>
+    <!-- CURRENT TOKEN -->
+    <div class="card">
+        <h2>🎯 Current Token: {{ current_token }}</h2>
+    </div>
 
     <!-- PATIENT LIST -->
-    <h2>Patients List:</h2>
+    <div class="card">
+        <h3>Patients</h3>
 
-    <ul>
         {% for p in patients %}
-        <li>
-            {{ p.name }} - Token {{ p.token }}
+        <div class="patient">
 
-            <!-- CALL NOW -->
-            <a href="/call_now/{{ p.token }}">
-                <button class="call-btn">📞 Call Now</button>
-            </a>
+            <div>
+                <b>{{ p.name }}</b> (Token {{ p.token }})
+            </div>
 
-            <!-- REMOVE -->
-            <a href="/delete/{{ p.token }}" class="remove-btn">❌ Remove</a>
-        </li>
+            <div>
+                {% if p.completed %}
+                    <span class="status done">✅ Done</span>
+                {% elif p.called and not p.answered %}
+                    {% if p.retry_done %}
+                        <span class="status retry">🔁 Retry</span>
+                    {% else %}
+                        <span class="status calling">📞 Calling</span>
+                    {% endif %}
+                {% else %}
+                    <span class="status waiting">⏳ Waiting</span>
+                {% endif %}
+            </div>
+
+            <div>
+                <a href="/call_now/{{ p.token }}">
+                    <button class="btn-green">📞</button>
+                </a>
+
+                <a href="/delete/{{ p.token }}">
+                    <button class="btn-red">❌</button>
+                </a>
+            </div>
+
+        </div>
         {% endfor %}
-    </ul>
 
-<script>
-let autoInterval = null;
+    </div>
 
-function startAuto() {
-    fetch('/start_auto').then(() => {
-
-        autoInterval = setInterval(() => {
-            fetch('/auto_call');
-        }, 5000);
-
-    });
-}
-
-function stopAuto() {
-    fetch('/stop_auto').then(() => {
-
-        clearInterval(autoInterval);
-
-    });
-}
-</script>
-    
 </body>
 </html>
