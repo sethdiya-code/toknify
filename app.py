@@ -116,9 +116,11 @@ def auto_call():
                 make_call(p["phone"], p["name"])
                 p["called"] = True
                 p["last_called_time"] = now
+                p["retry_done"]= False
+                p["answered"]= False
                 current_token = p["token"]
-                print("FIRST CALL:", p["name"])
-                return "calling"
+                print("NEXT CALL:", p["name"])
+                return "next"
 
     # ---------------- RETRY ----------------
     if current and not current["retry_done"] and not current["answered"]:
