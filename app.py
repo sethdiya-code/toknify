@@ -96,14 +96,18 @@ def auto_call():
 
     now = time.time()
 
+    print("CURRENT TOKEN:", current_token)
+    print("PATIENTS:", patients)
+
     # 👉 current patient
     for p in patients:
         if p["token"] == current_token:
 
             # retry after 50 sec
-            if p["retry"] == 1 and now - p["last_called_time"] > 50:
+            if p["retry"] == 1 and (now - p["last_called_time"] > 50):
+                print("RETRYING:", p["name"])
                 make_call(p["phone"], p["name"])
-                print("RETRY CALL:", p["name"])
+                
                 return "retry"
 
             return "waiting"
@@ -112,15 +116,17 @@ def auto_call():
     for p in patients:
         if p["token"] == current_token + 1:
 
+            print("FIRST CALL:", p["name"])
+
             make_call(p["phone"], p["name"])
 
             current_token = p["token"]
             p["called"] = True
             p["last_called_time"] = now
 
-            print("FIRST CALL:", p["name"])
+                        
             return "called"
-
+    print("NO PATIENT FOUND")    
     return "done"
 
 
