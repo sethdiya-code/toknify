@@ -179,6 +179,28 @@ def call_status():
             return "ok"
 
     return "ok"
+
+# ---------------- MANUAL CALL ----------------
+@app.route('/call_now/<int:token>')
+def call_now(token):
+    global patients, current_token
+
+    for p in patients:
+        if p["token"] == token:
+
+            make_call(p["phone"], p["name"])
+
+            p["called"] = True
+            p["retry_done"] = False
+            p["answered"] = False
+            p["last_called_time"] = time.time()
+
+            current_token = p["token"]
+
+            print("📞 MANUAL CALL:", p["name"])
+            return redirect('/')
+
+    return "Patient not found"
     
 # ---------------- DELETE ----------------
 
