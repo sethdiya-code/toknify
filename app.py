@@ -36,7 +36,7 @@ def add_patient():
         'phone': phone,
         'token': len(patients) + 1,
         'called': False,
-        'answered': False
+        'answered': False,
         'retry_done': False,
         'last_called_time': 0,
         'completed': False
@@ -133,7 +133,6 @@ def auto_call():
 
 
 # ---------------- WEBHOOK ----------------
-
 
 @app.route('/call_status', methods=['POST'])
 def call_status():
