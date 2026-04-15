@@ -62,8 +62,8 @@
     </form>
 
     <!-- AUTO CALL -->
-    <a href="/start_auto"><button>Start Auto Call</button></a>
-    <a href="/stop_auto"><button>Stop</button></a>
+    <button onclick="startAuto()">Start Auto Call</button>
+    <button onclick="stopAuto()">Stop</button>
 
     <!-- CALL BEFORE -->
     <h3>Call Before Tokens:</h3>
@@ -97,10 +97,26 @@
     </ul>
 
 <script>
-setInterval(() => {
-    fetch('/auto_call')
-}, 5000);
-</script>
+let autoInterval = null;
 
+function startAuto() {
+    fetch('/start_auto').then(() => {
+
+        autoInterval = setInterval(() => {
+            fetch('/auto_call');
+        }, 5000);
+
+    });
+}
+
+function stopAuto() {
+    fetch('/stop_auto').then(() => {
+
+        clearInterval(autoInterval);
+
+    });
+}
+</script>
+    
 </body>
 </html>
