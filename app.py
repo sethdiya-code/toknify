@@ -158,8 +158,14 @@ def call_status():
 # ---------------- DELETE ----------------
 @app.route('/delete/<int:token>')
 def delete_patient(token):
-    global patients
+    global patients, current_token
+    
     patients = [p for p in patients if p['token'] != token]
+
+    #RESET LOGIC
+    if len (patient)== 0:
+        current_token= 0
+        
     return redirect('/')
 
 
