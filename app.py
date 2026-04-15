@@ -164,25 +164,30 @@ def call_status():
             return "ok"
 
     return "ok"
+    
 # ---------------- DELETE ----------------
+
 @app.route('/delete/<int:token>')
 def delete_patient(token):
     global patients, current_token
 
     try:
-        patients = [p for p in patients if int(p['token']) != int(token)]
+        new_list = []
+        for p in patients:
+            if int(p['token']) != int(token):
+                new_list.append(p)
 
-    #RESET LOGIC
-        if len (patients)== 0:
-            current_token= 0
+        patients = new_list
+
+        if len(patients) == 0:
+            current_token = 0
 
         print("DELETED TOKEN:", token)
         return redirect('/')
 
-   except Exception as e:
+    except Exception as e:
         print("DELETE ERROR:", str(e))
         return "Error deleting patient"
-
 
 # ---------------- RUN ----------------
 if __name__ == '__main__':
