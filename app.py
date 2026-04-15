@@ -170,7 +170,7 @@ def delete_patient(token):
     global patients, current_token
 
     try:
-        patients = [p for p in patients if int(p['token']) != int (token)]
+        patients = [p for p in patients if int(p['token']) != int(token)]
 
     #RESET LOGIC
         if len (patients)== 0:
@@ -179,10 +179,9 @@ def delete_patient(token):
         print("DELETED TOKEN:", token)
         return redirect('/')
 
-except Exception as e:
- 
-       print("DELETE ERROR:", str(e))
-       return "Error deleting patient"
+   except Exception as e:
+        print("DELETE ERROR:", str(e))
+        return "Error deleting patient"
 
 
 # ---------------- RUN ----------------
