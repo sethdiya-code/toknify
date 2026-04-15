@@ -8,6 +8,7 @@ app = Flask(__name__)
 patients = []
 current_token = 0
 auto_running = False
+call_before= False
 
 TWILIO_NUMBER = "+17625258609"
 
@@ -18,7 +19,8 @@ def index():
     return render_template(
         'index.html',
         patients=patients,
-        current_token=current_token
+        current_token=current_token,
+        call_before=call_before
     )
 
 
