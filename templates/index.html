@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Token System</title>
+    <title>Toknify</title>
 </head>
-
 <body>
 
 <h1>Current Token: {{ current_token }}</h1>
 
+<!-- 🔥 ADD PATIENT -->
 <form action="/add" method="POST">
     <input type="text" name="name" placeholder="Patient Name" required>
     <input type="text" name="phone" placeholder="Phone Number" required>
@@ -16,41 +16,59 @@
 
 <br>
 
-<button onclick="startAuto()">Start Auto Call</button>
-<button onclick="stopAuto()">Stop</button>
+<!-- 🔥 AUTO CONTROL -->
+<a href="/start"><button>Start Auto Call</button></a>
+<a href="/stop"><button>Stop</button></a>
 
+<br><br>
+
+<!-- 🔥 CALL BEFORE SETTING -->
+<h3>Call Before Tokens:</h3>
+
+<button onclick="setCall(1)">1</button>
+<button onclick="setCall(2)">2</button>
+<button onclick="setCall(3)">3</button>
+<button onclick="setCall(4)">4</button>
+
+<p><b>Current:</b> {{ call_before }} tokens before</p>
+
+<hr>
+
+<!-- 🔥 PATIENT LIST -->
 <h2>Patients List:</h2>
 
 <ul>
 {% for p in patients %}
 <li>
     {{ p.name }} - Token {{ p.token }}
+
+    <!-- 📞 CALL NOW -->
+    <button onclick="callNow({{ p.token }})">
+        📞 Call Now
+    </button>
+
+    <!-- ❌ DELETE -->
     <a href="/delete/{{ p.token }}">❌ Remove</a>
 </li>
 {% endfor %}
 </ul>
 
+<!-- 🔥 JS -->
 <script>
-let running = false;
-
-function startAuto() {
-    running = true;
-    fetch("/start_auto");
+function setCall(value) {
+    fetch(`/set_call_before/${value}`)
+    .then(() => {
+        location.reload();
+    });
 }
 
-function stopAuto() {
-    running = false;
-    fetch("/stop_auto");
-}
-
-setInterval(() => {
-    if (!running) return;
-
-    fetch("/auto_call")
+function callNow(token) {
+    fetch(`/call/${token}`)
     .then(res => res.text())
-    .then(data => console.log(data));
-
-}, 5000);
+    .then(data => {
+        console.log("CALL:", data);
+    });
+}
 </script>
 
 </body>
