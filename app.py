@@ -8,7 +8,7 @@ app = Flask(__name__)
 patients = []
 current_token = 0
 auto_running = False
-call_before= False
+call_before= 2
 
 TWILIO_NUMBER = "+17625258609"
 
