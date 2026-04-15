@@ -57,7 +57,7 @@ def make_call(phone, name):
         to=phone,
         from_=TWILIO_NUMBER,
         status_callback="https://toknify.in/call_status",
-        status_callback_event=["completed"]
+        status_callback_event=["completed"],
         status_callback_method= "POST"
     )
 
