@@ -5,70 +5,64 @@ import time
 
 app = Flask(__name__)
 
-# 🔐 Twilio config (ENV me hona chahiye)
-TWILIO_NUMBER = "+17625258609"
-
 patients = []
 current_token = 0
 auto_running = False
-next_token = 1
+
+TWILIO_NUMBER = "+17625258609"
 
 
-# 🏠 HOME
+# ---------------- HOME ----------------
 @app.route('/')
 def index():
-    return render_template('index.html', patients=patients, current_token=current_token)
+    return render_template(
+        'index.html',
+        patients=patients,
+        current_token=current_token
+    )
 
 
-# ➕ ADD PATIENT
+# ---------------- ADD PATIENT ----------------
 @app.route('/add', methods=['POST'])
 def add_patient():
-    global next_token
-
-    name = request.form.get('name')
-    phone = request.form.get('phone')
+    name = request.form['name']
+    phone = request.form['phone']
 
     if not phone.startswith('+'):
         phone = '+91' + phone
 
-    token = next_token
-    next_token += 1
-
     patients.append({
         'name': name,
         'phone': phone,
-        'token': token,
+        'token': len(patients) + 1,
         'called': False,
-        'retry': 0,
-        'last_called_time': 0
+        'retry_done': False,
+        'last_called_time': 0,
+        'completed': False
     })
 
     return redirect('/')
 
 
-# 📞 CALL FUNCTION (TWILIO + WEBHOOK)
+# ---------------- MAKE CALL ----------------
 def make_call(phone, name):
-    try:
-        client = Client(
-            os.getenv("TWILIO_ACCOUNT_SID"),
-            os.getenv("TWILIO_AUTH_TOKEN")
-        )
+    client = Client(
+        os.getenv("TWILIO_ACCOUNT_SID"),
+        os.getenv("TWILIO_AUTH_TOKEN")
+    )
 
-        client.calls.create(
-            twiml=f'<Response><Say>Hello {name}, please come</Say></Response>',
-            to=phone,
-            from_=TWILIO_NUMBER,
-            status_callback="https://toknify.in/call_status",  # 👈 CHANGE IF DOMAIN DIFFERENT
-            status_callback_event=["completed"]
-        )
+    client.calls.create(
+        twiml=f'<Response><Say>Hello {name}, please come</Say></Response>',
+        to=phone,
+        from_=TWILIO_NUMBER,
+        status_callback="https://toknify.in/call_status",
+        status_callback_event=["completed"]
+    )
 
-        print("CALL SENT:", name)
-
-    except Exception as e:
-        print("CALL ERROR:", str(e))
+    print("📞 CALL:", name)
 
 
-# 🚀 START AUTO
+# ---------------- AUTO CONTROL ----------------
 @app.route('/start_auto')
 def start_auto():
     global auto_running
@@ -77,7 +71,6 @@ def start_auto():
     return "started"
 
 
-# ⛔ STOP AUTO
 @app.route('/stop_auto')
 def stop_auto():
     global auto_running
@@ -86,96 +79,90 @@ def stop_auto():
     return "stopped"
 
 
-# 🤖 AUTO CALL SYSTEM
+# ---------------- AUTO CALL LOGIC ----------------
 @app.route('/auto_call')
 def auto_call():
-    global current_token, auto_running
+    global current_token
 
     if not auto_running:
         return "stopped"
 
     now = time.time()
 
-    print("CURRENT TOKEN:", current_token)
-    print("PATIENTS:", patients)
-
     # 👉 current patient
+    current = None
     for p in patients:
         if p["token"] == current_token:
+            current = p
+            break
 
-            # retry after 50 sec
-            if p["retry"] == 1 and (now - p["last_called_time"] > 50):
-                print("RETRYING:", p["name"])
+    # ---------------- FIRST CALL ----------------
+    if current_token == 0:
+        for p in patients:
+            if not p["completed"]:
                 make_call(p["phone"], p["name"])
-                
-                return "retry"
+                p["called"] = True
+                p["last_called_time"] = now
+                current_token = p["token"]
+                print("FIRST CALL:", p["name"])
+                return "calling"
 
-            return "waiting"
+    # ---------------- RETRY ----------------
+    if current and not current["retry_done"]:
+        if now - current["last_called_time"] > 50:
+            make_call(current["phone"], current["name"])
+            current["retry_done"] = True
+            current["last_called_time"] = now
+            print("RETRY:", current["name"])
+            return "retry"
 
-    # 👉 next patient first call
-    for p in patients:
-        if p["token"] == current_token + 1:
+    # ---------------- NEXT PATIENT ----------------
+    if current and current["completed"]:
+        for p in patients:
+            if not p["completed"] and not p["called"]:
+                make_call(p["phone"], p["name"])
+                p["called"] = True
+                p["last_called_time"] = now
+                current_token = p["token"]
+                print("NEXT CALL:", p["name"])
+                return "next"
 
-            print("FIRST CALL:", p["name"])
-
-            make_call(p["phone"], p["name"])
-
-            current_token = p["token"]
-            p["called"] = True
-            p["last_called_time"] = now
-
-                        
-            return "called"
-    print("NO PATIENT FOUND")    
-    return "done"
+    return "waiting"
 
 
-# 🔥 WEBHOOK (MOST IMPORTANT)
+# ---------------- WEBHOOK ----------------
 @app.route('/call_status', methods=['POST'])
 def call_status():
     global current_token
 
-    status = request.form.get("CallStatus")
-    print("CALL STATUS:", status)
+    status = request.form.get('CallStatus')
+    print("STATUS:", status)
 
-    # current patient
-    current_patient = None
     for p in patients:
         if p["token"] == current_token:
-            current_patient = p
-            break
 
-    if not current_patient:
-        return "no patient"
+            # 👉 first call miss → retry allow
+            if status == "completed" and not p["retry_done"]:
+                print("MISSED → RETRY READY:", p["name"])
+                return "ok"
 
-    # ✅ answered
-    if status == "completed":
-        print("ANSWERED:", current_patient["name"])
-        current_token += 1
-        return "ok"
+            # 👉 retry ke baad → complete → next
+            if status == "completed" and p["retry_done"]:
+                p["completed"] = True
+                print("DONE → NEXT:", p["name"])
+                return "ok"
 
-    # ❌ not answered
-    else:
-        print("NOT ANSWERED:", current_patient["name"])
-
-        if current_patient["retry"] < 1:
-            current_patient["retry"] += 1
-            current_patient["last_called_time"] = time.time()
-            print("WAITING FOR RETRY")
-        else:
-            print("SKIP:", current_patient["name"])
-            current_token += 1
-
-        return "ok"
+    return "ok"
 
 
-# ❌ DELETE
+# ---------------- DELETE ----------------
 @app.route('/delete/<int:token>')
 def delete_patient(token):
     global patients
-    patients = [p for p in patients if p["token"] != token]
+    patients = [p for p in patients if p['token'] != token]
     return redirect('/')
 
 
+# ---------------- RUN ----------------
 if __name__ == '__main__':
     app.run(debug=True)
