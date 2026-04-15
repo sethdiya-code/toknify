@@ -121,7 +121,9 @@ def auto_call():
     # ---------------- NEXT PATIENT ----------------
     if current and current["completed"]:
         for p in patients:
-            if not p["completed"] and not p["called"]:
+            diff= p["token"]-current_token
+
+            if not p["completed"] and not p["called"] and diff== call_before:
                 make_call(p["phone"], p["name"])
                 p["called"] = True
                 p["last_called_time"] = now
