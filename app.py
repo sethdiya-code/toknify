@@ -22,7 +22,16 @@ def index():
         current_token=current_token,
         call_before=call_before
     )
+    
+# ---------------- SET CALL BEFORE ----------------
+@app.route('/set_call_before/<int:value>')
+def set_call_before(value):
+    global call_before
 
+    call_before = value
+    print("CALL BEFORE SET:", call_before)
+
+    return "ok"
 
 # ---------------- ADD PATIENT ----------------
 @app.route('/add', methods=['POST'])
