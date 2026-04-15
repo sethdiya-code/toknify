@@ -16,29 +16,40 @@
 
 <br>
 
-<button onclick="startAuto()">🚀 Start</button>
-<button onclick="stopAuto()">⛔ Stop</button>
+<button onclick="startAuto()">Start Auto Call</button>
+<button onclick="stopAuto()">Stop</button>
+
+<h2>Patients List:</h2>
 
 <ul>
 {% for p in patients %}
 <li>
-    {{ p.name }} - {{ p.token }}
-    <a href="/delete/{{ p.token }}">❌</a>
+    {{ p.name }} - Token {{ p.token }}
+    <a href="/delete/{{ p.token }}">❌ Remove</a>
 </li>
 {% endfor %}
 </ul>
 
 <script>
+let running = false;
+
 function startAuto() {
+    running = true;
     fetch("/start_auto");
 }
 
 function stopAuto() {
+    running = false;
     fetch("/stop_auto");
 }
 
 setInterval(() => {
-    fetch("/auto_call");
+    if (!running) return;
+
+    fetch("/auto_call")
+    .then(res => res.text())
+    .then(data => console.log(data));
+
 }, 5000);
 </script>
 
