@@ -36,6 +36,7 @@ def add_patient():
         'phone': phone,
         'token': len(patients) + 1,
         'called': False,
+        'answered': False
         'retry_done': False,
         'last_called_time': 0,
         'completed': False
@@ -57,6 +58,7 @@ def make_call(phone, name):
         from_=TWILIO_NUMBER,
         status_callback="https://toknify.in/call_status",
         status_callback_event=["completed"]
+        status_callback_method= "POST"
     )
 
     print("📞 CALL:", name)
@@ -108,7 +110,7 @@ def auto_call():
                 return "calling"
 
     # ---------------- RETRY ----------------
-    if current and not current["retry_done"]:
+    if current and not current["retry_done"] and not current["answered"]:
         if now - current["last_called_time"] > 50:
             make_call(current["phone"], current["name"])
             current["retry_done"] = True
@@ -131,42 +133,56 @@ def auto_call():
 
 
 # ---------------- WEBHOOK ----------------
+
+
 @app.route('/call_status', methods=['POST'])
 def call_status():
     global current_token
 
-    status = request.form.get('CallStatus')
-    print("STATUS:", status)
+    status = request.form.get("CallStatus")
+    duration = request.form.get("CallDuration")
+
+    print("STATUS:", status, "DURATION:", duration)
 
     for p in patients:
         if p["token"] == current_token:
 
-            # 👉 first call miss → retry allow
-            if status == "completed" and not p["retry_done"]:
-                print("MISSED → RETRY READY:", p["name"])
+            # ✅ agar call pick hua (duration > 0)
+            if duration and int(duration) > 0:
+                p["answered"] = True
+                p["completed"] = True
+                print("✅ ANSWERED:", p["name"])
                 return "ok"
 
-            # 👉 retry ke baad → complete → next
-            if status == "completed" and p["retry_done"]:
-                p["completed"] = True
-                print("DONE → NEXT:", p["name"])
+            # ❌ pick nahi hua → retry allow
+            if not p["retry_done"]:
+                print("❌ MISSED → RETRY:", p["name"])
                 return "ok"
+
+            # ❌ retry ke baad bhi nahi uthaya → skip
+            p["completed"] = True
+            print("❌ SKIPPED:", p["name"])
+            return "ok"
 
     return "ok"
-
-
 # ---------------- DELETE ----------------
 @app.route('/delete/<int:token>')
 def delete_patient(token):
     global patients, current_token
-    
-    patients = [p for p in patients if p['token'] != token]
+
+    try:
+        patients = [p for p in patients if int(p['token']) != int (token)]
 
     #RESET LOGIC
     if len (patient)== 0:
         current_token= 0
-        
+
+    print("DELETED TOKEN:", token)
     return redirect('/')
+
+except Exception as e:
+print("DELETE ERROR:", str(e))
+return "Error deleting patient"
 
 
 # ---------------- RUN ----------------
