@@ -176,8 +176,10 @@ def call_status():
 
     print("STATUS:", status, "DURATION:", duration)
 
+    phone= request.form.get("To")
+
     for p in patients:
-        if p["token"] == current_token:
+        if p["phone"] == phone:
 
             # ✅ CALL PICKED
             if duration and int(duration) > 0:
