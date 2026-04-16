@@ -16,11 +16,20 @@ TWILIO_NUMBER = "+17625258609"
 # ---------------- HOME ----------------
 @app.route('/')
 def index():
+    total= len(patients)
+    completed = len([p for p in patients if p.get("completed")])
+    calling = len([p for p in patients if p.get("called") and not p.get("completed")])
+    waiting = len([p for p in patients if not p.get("called")])
+    
     return render_template(
         'index.html',
         patients=patients,
         current_token=current_token,
-        call_before=call_before
+        call_before=call_before,
+        total=total,
+        completed=completed,
+        calling=calling,
+        waiting=waiting
     )
     
 # ---------------- SET CALL BEFORE ----------------
