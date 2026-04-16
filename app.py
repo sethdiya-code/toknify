@@ -2,9 +2,12 @@ from flask import Flask, render_template, request, redirect
 from twilio.rest import Client
 import os
 import time
+import sqlite3
+
 call_logs= []
 
 app = Flask(__name__)
+app.secret_key= "secret123"
 
 patients = []
 current_token = 0
@@ -13,10 +16,66 @@ call_before= 2
 
 TWILIO_NUMBER = "+17625258609"
 
+# 🔥 ADDED DATABASE INIT
+def init_db():
+    conn = sqlite3.connect("database.db")
+    c = conn.cursor()
 
-# ---------------- HOME ----------------
-@app.route('/')
+    c.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, email TEXT, password TEXT)")
+
+    conn.commit()
+    conn.close()
+
+init_db()
+
+
+# 🔥 ADDED SIGNUP
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        conn = sqlite3.connect("database.db")
+        c = conn.cursor()
+
+        c.execute("INSERT INTO users (email, password) VALUES (?, ?)", (email, password))
+
+        conn.commit()
+        conn.close()
+
+        return redirect('/')
+
+    return render_template('signup.html')
+
+
+# ---------------- HOME ------------
+
+@app.route('/', methods=['GET', 'POST'])  # 🔥 UPDATED
 def index():
+
+    # 🔥 ADDED LOGIN LOGIC
+    if request.method == "POST":
+        email = request.form['email']
+        password = request.form['password']
+
+        conn = sqlite3.connect("database.db")
+        c = conn.cursor()
+
+        c.execute("SELECT * FROM users WHERE email=? AND password=?", (email, password))
+        user = c.fetchone()
+
+        conn.close()
+
+        if user:
+            session["user_id"] = user[0]
+        else:
+            return "Invalid login"
+
+    # 🔥 ADDED PROTECTION
+    if "user_id" not in session:
+        return render_template("login.html")
+
     total= len(patients)
     completed = len([p for p in patients if p.get("completed")])
     calling = len([p for p in patients if p.get("called") and not p.get("completed")])
@@ -33,6 +92,14 @@ def index():
         calling=calling,
         waiting=waiting
     )
+    
+
+# 🔥 ADDED LOGOUT
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
+    
     
 # ---------------- SET CALL BEFORE ----------------
 @app.route('/set_call_before/<int:value>')
