@@ -136,6 +136,36 @@
 
         <p>Current: {{ call_before }} tokens before</p>
     </div>
+    
+
+    
+    <div class="card" style="margin-top:20px;">
+    <h3>📊 Admin Dashboard</h3>
+
+    <div style="display:flex; gap:15px; flex-wrap:wrap; margin-top:10px;">
+
+        <div style="background:#e3f2fd; padding:15px; border-radius:12px;">
+            <b>Total Patients</b><br>
+            {{ total }}
+        </div>
+
+        <div style="background:#d4edda; padding:15px; border-radius:12px;">
+            <b>Completed</b><br>
+            {{ completed }}
+        </div>
+
+        <div style="background:#cce5ff; padding:15px; border-radius:12px;">
+            <b>Calling</b><br>
+            {{ calling }}
+        </div>
+
+        <div style="background:#fff3cd; padding:15px; border-radius:12px;">
+            <b>Waiting</b><br>
+            {{ waiting }}
+        </div>
+
+    </div>
+</div>
 
     <!-- CURRENT TOKEN -->
     <div class="card">
