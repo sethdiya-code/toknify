@@ -185,6 +185,8 @@ def call_status():
             if duration and int(duration) > 0:
                 p["answered"] = True
                 p["completed"] = True
+                p["called"] = False
+
 
                 call_logs.append({
                     "name": p["name"],
