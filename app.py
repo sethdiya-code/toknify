@@ -88,6 +88,7 @@ def make_call(phone, name):
         "time": time.strftime("%H:%M:%S"),
         "status": "Calling"
 })
+    
 print("📞 CALL:", name)
 
 
