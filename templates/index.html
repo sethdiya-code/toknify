@@ -212,5 +212,40 @@
 
     </div>
 
+    <div class="card">
+        <h3>📞 Call Logs</h3>
+
+        {% if call_logs %}
+        <table style="width:100%; margin-top:10px;">
+            <tr>
+                 <th>Name</th>
+                 <th>Phone</th>
+                 <th>Time</th>
+                 <th>Status</th>
+                </tr>
+
+            {% for log in call_logs %}
+            <tr>
+                <td>{{ log.name }}</td>
+                <td>{{ log.phone }}</td>
+                <td>{{ log.time }}</td>
+                <td>
+                    <span class="status 
+                        {% if log.status == 'Answered' %}done
+                        {% elif log.status == 'Missed' %}retry
+                        {% elif log.status == 'Skipped' %}waiting
+                        {% else %}calling{% endif %}">
+                        {{ log.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            
+            </table>
+            {% else %}
+                <p style="color:gray;">No call logs yet</p>
+            {% endif %}
+</div>
+
 </body>
 </html>
