@@ -82,6 +82,7 @@ def make_call(phone, name):
         status_callback_event=["completed"],
         status_callback_method= "POST"
     )
+    
     call_logs.append({
         "name": name,
         "phone": phone,
@@ -89,7 +90,7 @@ def make_call(phone, name):
         "status": "Calling"
     })
     
-print("📞 CALL:", name)
+    print("📞 CALL:", name)
 
 
 # ---------------- AUTO CONTROL ----------------
