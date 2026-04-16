@@ -27,7 +27,7 @@ def index():
         patients=patients,
         current_token=current_token,
         call_before=call_before,
-        call_logs=call=logs,
+        call_logs=call_logs,
         total=total,
         completed=completed,
         calling=calling,
@@ -177,55 +177,55 @@ def call_status():
     for p in patients:
         if p["token"] == current_token:
 
-            # ✅ agar call pick hua (duration > 0)
-
+            # ✅ CALL PICKED
             if duration and int(duration) > 0:
-    # ✅ answered
-    p["answered"] = True
-    p["completed"] = True
+                p["answered"] = True
+                p["completed"] = True
 
-    call_logs.append({
-        "name": p["name"],
-        "phone": p["phone"],
-        "time": time.strftime("%H:%M:%S"),
-        "status": "Answered"
-    })
+                call_logs.append({
+                    "name": p["name"],
+                    "phone": p["phone"],
+                    "time": time.strftime("%H:%M:%S"),
+                    "status": "Answered"
+                })
 
-    print("✅ ANSWERED:", p["name"])
+                print("✅ ANSWERED:", p["name"])
+                return "ok"
+
+            # ❌ MISSED → RETRY
+            if not p.get("retry_done"):
+                print("❌ MISSED → RETRY:", p["name"])
+
+                call_logs.append({
+                    "name": p["name"],
+                    "phone": p["phone"],
+                    "time": time.strftime("%H:%M:%S"),
+                    "status": "Missed"
+                })
+
+                p["retry_done"] = True
+
+                # 🔁 retry call
+                make_call(p["phone"], p["name"])
+
+                return "ok"
+
+            # ❌ SKIPPED (retry ke baad bhi nahi uthaya)
+            p["completed"] = True
+
+            call_logs.append({
+                "name": p["name"],
+                "phone": p["phone"],
+                "time": time.strftime("%H:%M:%S"),
+                "status": "Skipped"
+            })
+
+            print("❌ SKIPPED:", p["name"])
+            return "ok"
+
     return "ok"
 
-
-# ❌ MISSED (retry allowed)
-if not p["retry_done"]:
-    print("❌ MISSED → RETRY:", p["name"])
-
-    call_logs.append({
-        "name": p["name"],
-        "phone": p["phone"],
-        "time": time.strftime("%H:%M:%S"),
-        "status": "Missed"
-    })
-
-    p["retry_done"] = True
-
-    # 👉 retry call
-    make_call(p["phone"], p["name"])
-
-    return "ok"
-
-
-# ❌ SKIPPED (retry ke baad bhi fail)
-p["completed"] = True
-print("❌ SKIPPED:", p["name"])
-
-call_logs.append({
-    "name": p["name"],
-    "phone": p["phone"],
-    "time": time.strftime("%H:%M:%S"),
-    "status": "Skipped"
-})
-
-return "ok"
+           
 
 # ---------------- MANUAL CALL ----------------
 @app.route('/call_now/<int:token>')
