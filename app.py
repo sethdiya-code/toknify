@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect
 from twilio.rest import Client
 import os
 import time
+call_logs= []
 
 app = Flask(__name__)
 
@@ -26,6 +27,7 @@ def index():
         patients=patients,
         current_token=current_token,
         call_before=call_before,
+        call_logs=call=logs,
         total=total,
         completed=completed,
         calling=calling,
@@ -80,8 +82,13 @@ def make_call(phone, name):
         status_callback_event=["completed"],
         status_callback_method= "POST"
     )
-
-    print("📞 CALL:", name)
+    call_logs.append({
+        "name": name,
+        "phone": phone,
+        "time": time.strftime("%H:%M:%S"),
+        "status": "Calling"
+})
+print("📞 CALL:", name)
 
 
 # ---------------- AUTO CONTROL ----------------
@@ -171,23 +178,54 @@ def call_status():
         if p["token"] == current_token:
 
             # ✅ agar call pick hua (duration > 0)
+
             if duration and int(duration) > 0:
-                p["answered"] = True
-                p["completed"] = True
-                print("✅ ANSWERED:", p["name"])
-                return "ok"
+    # ✅ answered
+    p["answered"] = True
+    p["completed"] = True
 
-            # ❌ pick nahi hua → retry allow
-            if not p["retry_done"]:
-                print("❌ MISSED → RETRY:", p["name"])
-                return "ok"
+    call_logs.append({
+        "name": p["name"],
+        "phone": p["phone"],
+        "time": time.strftime("%H:%M:%S"),
+        "status": "Answered"
+    })
 
-            # ❌ retry ke baad bhi nahi uthaya → skip
-            p["completed"] = True
-            print("❌ SKIPPED:", p["name"])
-            return "ok"
+    print("✅ ANSWERED:", p["name"])
+    return "ok"
+
+
+# ❌ MISSED (retry allowed)
+if not p["retry_done"]:
+    print("❌ MISSED → RETRY:", p["name"])
+
+    call_logs.append({
+        "name": p["name"],
+        "phone": p["phone"],
+        "time": time.strftime("%H:%M:%S"),
+        "status": "Missed"
+    })
+
+    p["retry_done"] = True
+
+    # 👉 retry call
+    make_call(p["phone"], p["name"])
 
     return "ok"
+
+
+# ❌ SKIPPED (retry ke baad bhi fail)
+p["completed"] = True
+print("❌ SKIPPED:", p["name"])
+
+call_logs.append({
+    "name": p["name"],
+    "phone": p["phone"],
+    "time": time.strftime("%H:%M:%S"),
+    "status": "Skipped"
+})
+
+return "ok"
 
 # ---------------- MANUAL CALL ----------------
 @app.route('/call_now/<int:token>')
