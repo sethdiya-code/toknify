@@ -48,6 +48,11 @@ def signup():
 
     return render_template('signup.html')
 
+# 🔥 ADD THIS LOGIN ROUTE
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
 # ================= LOGIN  =================
 @app.route('/login', methods=['GET', 'POST'])
 def login():
