@@ -98,7 +98,7 @@ def index():
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect('/')
+    return redirect('/login')
     
     
 # ---------------- SET CALL BEFORE ----------------
