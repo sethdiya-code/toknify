@@ -48,6 +48,30 @@ def signup():
 
     return render_template('signup.html')
 
+# ================= LOGIN  =================
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+
+    if request.method == "POST":
+        email = request.form['email']
+        password = request.form['password']
+
+        conn = sqlite3.connect("database.db")
+        c = conn.cursor()
+
+        c.execute("SELECT * FROM users WHERE email=? AND password=?", (email, password))
+        user = c.fetchone()
+
+        conn.close()
+
+        if user:
+            session["user_id"] = user[0]   # 🔥 SESSION SET
+            return redirect('/')           # dashboard
+        else:
+            return "Invalid login"
+
+    return render_template("login.html")
+
 
 # ---------------- HOME ------------
 
@@ -246,7 +270,7 @@ def call_status():
     for p in patients:
         if p["token"] == current_token:
 
-            # ✅ find latest log for this patient
+            # ✅ find the latest log for this patient
             for log in reversed(call_logs):
                 if log["phone"] == p["phone"]:
 
