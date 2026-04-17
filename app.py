@@ -88,7 +88,6 @@ def index():
 
     # 🔥 ADDED LOGIN LOGIC
     if request.method == "POST":
-        return redirect('/login')
         email = request.form['email']
         password = request.form['password']
 
