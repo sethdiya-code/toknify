@@ -127,9 +127,10 @@
 
 <div class="container">
 
-<h1 style="display:flex; align-items:center; gap:10px;">
-    📞 <span style="font-weight:700;">Toknify</span> 
-    <span style="color:gray; font-size:18px;">Dashboard</span>
+<h1 style="display:flex; align-items:center; gap:10px; font-size:28px;">
+    📞 
+    <span style="font-weight:700; color:#111;">Toknify</span> 
+    <span style="font-weight:500; color:#333;">Dashboard</span>
 </h1>
 
 <!-- ADD PATIENT -->
@@ -230,13 +231,13 @@
             {% endif %}
         </div>
 
-       <div style="display:flex; gap:8px;">
+       <div style="display:flex; gap:10px;">
     <a href="/call_now/{{ p.token }}">
-        <button class="btn-green">📞</button>
+        <button class="btn-green">Call📞</button>
     </a>
 
     <a href="/delete/{{ p.token }}">
-        <button class="btn-red">✖</button>
+        <button class="btn-red">Remove✖</button>
     </a>
 </div>
 
