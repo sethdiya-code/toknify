@@ -48,10 +48,7 @@ def signup():
 
     return render_template('signup.html')
 
-# 🔥 ADD THIS LOGIN ROUTE
-@app.route('/login')
-def login_page():
-    return render_template('login.html')
+
 
 # ================= LOGIN  =================
 @app.route('/login', methods=['GET', 'POST'])
@@ -110,7 +107,7 @@ def index():
 
     # 🔥 ADDED PROTECTION
     if "user_id" not in session:
-        return render_template("login.html")
+        return render_template('/login')
 
     total= len(patients)
     completed = len([p for p in patients if p.get("completed")])
