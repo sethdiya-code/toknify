@@ -102,6 +102,7 @@ def index():
 
         if user:
             session["user_id"] = user[0]
+            return redirect('/')
         else:
             return "Invalid login"
 
