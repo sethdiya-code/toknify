@@ -125,7 +125,7 @@ def index():
 # 🔥 ADDED LOGOUT
 @app.route('/logout')
 def logout():
-    session.pop("user_id", None)
+    print("LOGOUT HIT")
     session.clear()
     return redirect('/login')
     
