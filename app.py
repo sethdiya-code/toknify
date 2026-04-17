@@ -78,6 +78,9 @@ def login():
 @app.route('/', methods=['GET', 'POST'])  # 🔥 UPDATED
 def index():
 
+    if "user_id" not in session:
+        return redirect('/login')
+
     # 🔥 ADDED LOGIN LOGIC
     if request.method == "POST":
         email = request.form['email']
@@ -121,6 +124,7 @@ def index():
 # 🔥 ADDED LOGOUT
 @app.route('/logout')
 def logout():
+    session.pop("user_id", None)
     session.clear()
     return redirect('/login')
     
