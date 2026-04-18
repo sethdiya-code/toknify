@@ -296,21 +296,21 @@
             <div id="dropdownMenu" class="dropdown-content">
 
                 <div class="dropdown-section">
-                    <p><b>🏥 Clinic:</b> City Care Clinic</p>
-                    <p><b>👤 Admin:</b> Diya Seth</p>
-                    <p><b>📧 Email:</b> admin@toknify.com</p>
+                    <p><b>🏥 Organization:</b> {{ session['organization _name'] }}</p>
+                    <p><b>👤 Admin:</b> {{ session['admin_name'] }}</p>
+                    <p><b>📧 Email:</b> {{ session['user_email'] }}</p>
                 </div>
 
                 <hr>
 
-                <a href="#">📊 Today’s Report</a>
-                <a href="#">📞 Call History</a>
-                <a href="#">📁 Patient Records</a>
+                <a href="/">📊 Today’s Report</a>
+                <a href="/">📞 Call History</a>
+                <a href="/">📁 Patient Records</a>
 
                 <hr>
 
-                <a href="#">✏ Edit Profile</a>
-                <a href="#">⚙ Token Settings</a>
+                <a href="/">✏ Edit Profile</a>
+                <a href="/">⚙ Token Settings</a>
 
                 <hr>
 
