@@ -99,7 +99,7 @@ def index():
         conn = sqlite3.connect("database.db")
         c = conn.cursor()
 
-        c.execute("SELECT * FROM users WHERE email=? AND password=?", (email, password))
+        c.execute("""SELECT id, email, password, admin_name, organization_name FROM users WHERE email=? AND password=?""", (email, password))
         user = c.fetchone()
 
         conn.close()
