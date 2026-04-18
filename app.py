@@ -21,7 +21,7 @@ def init_db():
     conn = sqlite3.connect("database.db")
     c = conn.cursor()
 
-    c.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, email TEXT, password TEXT)")
+    c.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, email TEXT, password TEXT, admin_name TEXT, organization_name TEXT)")
 
     conn.commit()
     conn.close()
@@ -35,11 +35,13 @@ def signup():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
+        admin_name= request.form['admin_name']
+        organization_name= request.form['organization_name']
 
         conn = sqlite3.connect("database.db")
         c = conn.cursor()
 
-        c.execute("INSERT INTO users (email, password) VALUES (?, ?)", (email, password))
+        c.execute("INSERT INTO users (email, password, admin_name, organization_name) VALUES (?, ?, ?, ?)", (email, password, admin_name, organization_name ))
 
         conn.commit()
         conn.close()
@@ -70,8 +72,11 @@ def login():
         conn.close()
 
         if user:
-            session["user_id"] = user[0]   # 🔥 SESSION SET
-            return redirect('/')           # dashboard
+            session["user_id"] = user[0]
+            session["user_email"] = user[1]
+            session["admin_name"] = user[3]
+            session["organization_name"] = user[4]
+            return redirect('/')          
         else:
             return "Invalid login"
 
