@@ -15,6 +15,62 @@
             margin: auto;
         }
 
+        .top-header {
+            background: white;
+            padding: 18px 25px;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .left-section {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .logo {
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+        }
+
+        .clinic-info h2 {
+            margin: 0;
+            font-size: 24px;
+            color: #111;
+        }
+
+        .clinic-info p {
+            margin: 4px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .right-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .edit-btn {
+            background: #f1f3f6;
+            color: #333;
+            padding: 10px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .edit-btn:hover {
+            background: #e4e7ec;
+        }
+
         h1 {
             font-weight: 600;
             margin-bottom: 20px;
@@ -48,21 +104,22 @@
             cursor: pointer;
         }
 
-        .btn-green { background: #28a745; color: white; }
-        .btn-red { background: #dc3545; color: white; }
-        .btn-blue { background: #007bff; color: white; }
+        .btn-green {
+            background: #28a745;
+            color: white;
+        }
 
-        .stats-card {
-            flex: 1;
-            min-width: 120px;
-            text-align: center;
-            font-weight: bold;
+        .btn-red {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-blue {
+            background: #007bff;
+            color: white;
         }
 
         .logout-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
             background: #dc3545;
             color: white;
             border: none;
@@ -70,8 +127,15 @@
             border-radius: 10px;
             font-weight: 500;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-         }
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .stats-card {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            font-weight: bold;
+        }
 
         .big-number {
             font-size: 28px;
@@ -119,10 +183,21 @@
             border-radius: 20px;
         }
 
-        .waiting { background: #ffeeba; }
-        .calling { background: #cce5ff; }
-        .retry { background: #f8d7da; }
-        .done { background: #d4edda; }
+        .waiting {
+            background: #ffeeba;
+        }
+
+        .calling {
+            background: #cce5ff;
+        }
+
+        .retry {
+            background: #f8d7da;
+        }
+
+        .done {
+            background: #d4edda;
+        }
     </style>
 
     <script>
@@ -141,130 +216,157 @@
 
 <div class="container">
 
-<h1 style="display:flex; align-items:center; gap:10px; font-size:28px;">
-    📞 
-    <span style="font-weight:700; color:#111;">Toknify</span> 
-    <span style="font-weight:400; color:#333;">Dashboard</span>
-</h1>
+    <!-- 🔥 PREMIUM HEADER -->
 
-<!-- ADD PATIENT -->
-<div class="card">
-    <h3>Add Patient</h3>
+    <div class="top-header">
 
-    <form action="/add" method="POST">
-        <input type="text" name="name" placeholder="Patient Name" required>
-        <input type="text" name="phone" placeholder="Phone Number" required>
-        <button type="submit" class="btn-blue">Add</button>
-    </form>
-</div>
+        <div class="left-section">
+            <img src="/static/logo.png" alt="Toknify Logo" class="logo">
 
-<!-- AUTO CALL -->
-<div class="card">
-    <h3>📞 Auto Call Control</h3>
-
-    <div style="display:flex; gap:10px;">
-        <a href="/start_auto" style="flex:1;">
-            <button class="btn-green" style="width:100%;">Start Auto Call</button>
-        </a>
-
-        <a href="/stop_auto" style="flex:1;">
-            <button class="btn-red" style="width:100%;">Stop</button>
-        </a>
-    </div>
-</div>
-
-<!-- CALL BEFORE -->
-<div class="card">
-    <h3>⚙️ Call Before Tokens</h3>
-
-    <div class="token-grid">
-        <div onclick="setCallBefore(1)" class="token-box {{ 'active-token' if call_before==1 else '' }}">1</div>
-        <div onclick="setCallBefore(2)" class="token-box {{ 'active-token' if call_before==2 else '' }}">2</div>
-        <div onclick="setCallBefore(3)" class="token-box {{ 'active-token' if call_before==3 else '' }}">3</div>
-        <div onclick="setCallBefore(4)" class="token-box {{ 'active-token' if call_before==4 else '' }}">4</div>
-    </div>
-
-    <p>Current: <b>{{ call_before }}</b> tokens before</p>
-</div>
-
-<!-- ADMIN DASHBOARD -->
-<div class="card">
-    <h3>📊 Admin Dashboard</h3>
-
-    <div style="display:flex; gap:15px; flex-wrap:wrap;">
-
-        <div class="stats-card" style="background:#e3f2fd; padding:15px; border-radius:12px;">
-            Total Patients
-            <div class="big-number">{{ total }}</div>
+            <div class="clinic-info">
+                <h2>🏥 City Care Clinic</h2>
+                <p>Admin: Diya Seth</p>
+                <p>Login Time: Today</p>
+            </div>
         </div>
 
-        <div class="stats-card" style="background:#d4edda; padding:15px; border-radius:12px;">
-            Completed
-            <div class="big-number">{{ completed }}</div>
-        </div>
+        <div class="right-section">
+            <a href="#" class="edit-btn">✏ Edit Profile</a>
 
-        <div class="stats-card" style="background:#cce5ff; padding:15px; border-radius:12px;">
-            Calling
-            <div class="big-number">{{ calling }}</div>
-        </div>
-
-        <div class="stats-card" style="background:#fff3cd; padding:15px; border-radius:12px;">
-            Waiting
-            <div class="big-number">{{ waiting }}</div>
+            <button class="logout-btn" onclick="window.location.href='/logout'">
+                Logout
+            </button>
         </div>
 
     </div>
-</div>
 
-<!-- CURRENT TOKEN -->
-<div class="card" style="text-align:center;">
-    <h3>🎯 Current Token</h3>
-    <div style="font-size:50px; font-weight:700; color:#007bff;">
-        {{ current_token }}
+    <!-- ADD PATIENT -->
+
+    <div class="card">
+        <h3>Add Patient</h3>
+
+        <form action="/add" method="POST">
+            <input type="text" name="name" placeholder="Patient Name" required>
+            <input type="text" name="phone" placeholder="Phone Number" required>
+            <button type="submit" class="btn-blue">Add</button>
+        </form>
     </div>
-</div>
 
-<!-- PATIENTS -->
-<div class="card">
-    <h3>Patients</h3>
+    <!-- AUTO CALL -->
 
-    {% for p in patients %}
-    <div class="patient">
+    <div class="card">
+        <h3>📞 Auto Call Control</h3>
 
-        <div>
-            <b>{{ p.name }}</b> (Token {{ p.token }})
+        <div style="display:flex; gap:10px;">
+            <a href="/start_auto" style="flex:1;">
+                <button class="btn-green" style="width:100%;">
+                    Start Auto Call
+                </button>
+            </a>
+
+            <a href="/stop_auto" style="flex:1;">
+                <button class="btn-red" style="width:100%;">
+                    Stop
+                </button>
+            </a>
+        </div>
+    </div>
+
+    <!-- CALL BEFORE -->
+
+    <div class="card">
+        <h3>⚙️ Call Before Tokens</h3>
+
+        <div class="token-grid">
+            <div onclick="setCallBefore(1)" class="token-box {{ 'active-token' if call_before==1 else '' }}">1</div>
+            <div onclick="setCallBefore(2)" class="token-box {{ 'active-token' if call_before==2 else '' }}">2</div>
+            <div onclick="setCallBefore(3)" class="token-box {{ 'active-token' if call_before==3 else '' }}">3</div>
+            <div onclick="setCallBefore(4)" class="token-box {{ 'active-token' if call_before==4 else '' }}">4</div>
         </div>
 
-        <div>
-            {% if p.completed %}
-                <span class="status done">Done</span>
-            {% elif p.called %}
-                <span class="status calling">Calling</span>
-            {% else %}
-                <span class="status waiting">Waiting</span>
-            {% endif %}
-        </div>
-
-       <div style="display:flex; gap:10px;">
-    <a href="/call_now/{{ p.token }}">
-        <button class="btn-green">Call📞</button>
-    </a>
-
-    <a href="/delete/{{ p.token }}">
-        <button class="btn-red">Remove✖</button>
-    </a>
-</div>
-
+        <p>
+            Current:
+            <b>{{ call_before }}</b>
+            tokens before
+        </p>
     </div>
-    {% endfor %}
-</div>
 
-<!-- LOGOUT -->
-<div
-   <button class="logout-btn" onclick="window.location.href='/logout'">
-    Logout
-</button>
-</div>
+    <!-- ADMIN DASHBOARD -->
+
+    <div class="card">
+        <h3>📊 Admin Dashboard</h3>
+
+        <div style="display:flex; gap:15px; flex-wrap:wrap;">
+
+            <div class="stats-card" style="background:#e3f2fd; padding:15px; border-radius:12px;">
+                Total Patients
+                <div class="big-number">{{ total }}</div>
+            </div>
+
+            <div class="stats-card" style="background:#d4edda; padding:15px; border-radius:12px;">
+                Completed
+                <div class="big-number">{{ completed }}</div>
+            </div>
+
+            <div class="stats-card" style="background:#cce5ff; padding:15px; border-radius:12px;">
+                Calling
+                <div class="big-number">{{ calling }}</div>
+            </div>
+
+            <div class="stats-card" style="background:#fff3cd; padding:15px; border-radius:12px;">
+                Waiting
+                <div class="big-number">{{ waiting }}</div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CURRENT TOKEN -->
+
+    <div class="card" style="text-align:center;">
+        <h3>🎯 Current Token</h3>
+
+        <div style="font-size:50px; font-weight:700; color:#007bff;">
+            {{ current_token }}
+        </div>
+    </div>
+
+    <!-- PATIENTS -->
+
+    <div class="card">
+        <h3>Patients</h3>
+
+        {% for p in patients %}
+        <div class="patient">
+
+            <div>
+                <b>{{ p.name }}</b>
+                (Token {{ p.token }})
+            </div>
+
+            <div>
+                {% if p.completed %}
+                    <span class="status done">Done</span>
+                {% elif p.called %}
+                    <span class="status calling">Calling</span>
+                {% else %}
+                    <span class="status waiting">Waiting</span>
+                {% endif %}
+            </div>
+
+            <div style="display:flex; gap:10px;">
+                <a href="/call_now/{{ p.token }}">
+                    <button class="btn-green">Call 📞</button>
+                </a>
+
+                <a href="/delete/{{ p.token }}">
+                    <button class="btn-red">Remove ✖</button>
+                </a>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
 
 </div>
 
