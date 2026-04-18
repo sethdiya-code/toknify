@@ -46,7 +46,7 @@ def signup():
         conn.commit()
         conn.close()
 
-        return redirect('/')
+        return redirect('/login')
 
     return render_template('signup.html')
 
