@@ -115,7 +115,20 @@ def index():
     WHERE user_id = ?
     """, (session["user_id"],))
 
-    patients = c.fetchall()
+   rows = c.fetchall()
+
+patients = []
+for row in rows:
+    patients.append({
+        "name": row[0],
+        "phone": row[1],
+        "token": row[2],
+        "called": False,
+        "completed": False,
+        "answered": False,
+        "retry_done": False,
+        "last_called_time": 0
+    })
 
     conn.close()
 
