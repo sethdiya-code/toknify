@@ -23,6 +23,16 @@ def init_db():
 
     c.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, email TEXT, password TEXT, admin_name TEXT, organization_name TEXT)")
 
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS patients (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        phone TEXT,
+        token INTEGER,
+        user_id INTEGER
+    )
+    """)
+
     conn.commit()
     conn.close()
 
@@ -114,24 +124,37 @@ def index():
     if "user_id" not in session:
         return render_template('/login')
 
-    total= len(patients)
-    completed = len([p for p in patients if p.get("completed")])
-    calling = len([p for p in patients if p.get("called") and not p.get("completed")])
-    waiting = len([p for p in patients if not p.get("called")])
-    
-    return render_template(
-        'index.html',
-        patients=patients,
-        current_token=current_token,
-        call_before=call_before,
-        call_logs=call_logs,
-        total=total,
-        completed=completed,
-        calling=calling,
-        waiting=waiting
-    )
-    
+conn = sqlite3.connect("database.db")
+c = conn.cursor()
 
+c.execute("""
+SELECT name, phone, token
+FROM patients
+WHERE user_id = ?
+""", (session["user_id"],))
+
+patients = c.fetchall()
+
+conn.close()
+
+total = len(patients)
+completed = 0
+calling = 0
+waiting = len(patients)
+
+return render_template(
+    "index.html",
+    patients=patients,
+    current_token=current_token,
+    call_before=call_before,
+    call_logs=call_logs,
+    total=total,
+    completed=completed,
+    calling=calling,
+    waiting=waiting
+)
+
+   
 # 🔥 ADDED LOGOUT
 @app.route('/logout')
 def logout():
@@ -159,16 +182,21 @@ def add_patient():
     if not phone.startswith('+'):
         phone = '+91' + phone
 
-    patients.append({
-        'name': name,
-        'phone': phone,
-        'token': len(patients) + 1,
-        'called': False,
-        'answered': False,
-        'retry_done': False,
-        'last_called_time': 0,
-        'completed': False
-    })
+    conn= sqlite3.connect("database.db")
+    c=conn.cursor()
+
+    c.execute("""
+    INSERT INTO patients (name, phone, token, user_id)
+    VALUES (?, ?, ?, ?)
+    """, (
+        name,
+        phone,
+        get_next_token(),
+        session["user_id"]
+    ))
+
+    conn.commit()
+    conn.close()
 
     return redirect('/')
 
