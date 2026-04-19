@@ -127,32 +127,32 @@ def index():
     conn = sqlite3.connect("database.db")
     c = conn.cursor()
 
-   c.execute("""
-   SELECT name, phone, token
-   FROM patients
-   WHERE user_id = ?
-   """, (session["user_id"],))
+    c.execute("""
+    SELECT name, phone, token
+    FROM patients
+    WHERE user_id = ?
+    """, (session["user_id"],))
 
-  patients = c.fetchall()
+    patients = c.fetchall()
 
-  conn.close()
+    conn.close()
 
-total = len(patients)
-completed = 0
-calling = 0
-waiting = len(patients)
+   total = len(patients)
+   completed = 0
+   calling = 0
+   waiting = len(patients)
 
-return render_template(
-    "index.html",
-    patients=patients,
-    current_token=current_token,
-    call_before=call_before,
-    call_logs=call_logs,
-    total=total,
-    completed=completed,
-    calling=calling,
-    waiting=waiting
-)
+   return render_template(
+       "index.html",
+        patients=patients,
+        current_token=current_token,
+        call_before=call_before,
+        call_logs=call_logs,
+        total=total,
+        completed=completed,
+        calling=calling,
+        waiting=waiting
+  )
 
    
 # 🔥 ADDED LOGOUT
