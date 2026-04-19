@@ -124,18 +124,18 @@ def index():
     if "user_id" not in session:
         return render_template('/login')
 
-conn = sqlite3.connect("database.db")
-c = conn.cursor()
+    conn = sqlite3.connect("database.db")
+    c = conn.cursor()
 
-c.execute("""
-SELECT name, phone, token
-FROM patients
-WHERE user_id = ?
-""", (session["user_id"],))
+   c.execute("""
+   SELECT name, phone, token
+   FROM patients
+   WHERE user_id = ?
+   """, (session["user_id"],))
 
-patients = c.fetchall()
+  patients = c.fetchall()
 
-conn.close()
+  conn.close()
 
 total = len(patients)
 completed = 0
