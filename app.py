@@ -137,13 +137,13 @@ def index():
 
     conn.close()
 
-   total = len(patients)
-   completed = 0
-   calling = 0
-   waiting = len(patients)
+    total = len(patients)
+    completed = 0
+    calling = 0
+    waiting = len(patients)
 
-   return render_template(
-       "index.html",
+    return render_template(
+        "index.html",
         patients=patients,
         current_token=current_token,
         call_before=call_before,
@@ -152,7 +152,7 @@ def index():
         completed=completed,
         calling=calling,
         waiting=waiting
-  )
+   )
 
    
 # 🔥 ADDED LOGOUT
