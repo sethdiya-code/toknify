@@ -16,7 +16,7 @@ call_before= 2
 
 TWILIO_NUMBER = "+17625258609"
 
-# 🔥 ADDED DATABASE INIT
+#  ADDED DATABASE INIT
 def init_db():
     conn = sqlite3.connect("database.db")
     c = conn.cursor()
@@ -39,7 +39,7 @@ def init_db():
 init_db()
 
 
-# 🔥 ADDED SIGNUP
+#  ADDED SIGNUP
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -59,10 +59,9 @@ def signup():
         return redirect('/login')
 
     return render_template('signup.html')
+    
 
-
-
-# ================= LOGIN  =================
+# LOGIN 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 
@@ -93,8 +92,7 @@ def login():
     return render_template("login.html")
 
 
-# ---------------- HOME ------------
-
+# HOME 
 @app.route('/', methods=['GET', 'POST'])
 def index():
 
@@ -146,7 +144,7 @@ def index():
     )
 
    
-# 🔥 ADDED LOGOUT
+# ADDED LOGOUT
 @app.route('/logout')
 def logout():
     print("LOGOUT HIT")
@@ -154,7 +152,7 @@ def logout():
     return redirect('/login')
     
     
-# ---------------- SET CALL BEFORE ----------------
+# SET CALL BEFORE 
 @app.route('/set_call_before/<int:value>')
 def set_call_before(value):
     global call_before
@@ -182,8 +180,9 @@ def get_next_token():
         return 1
 
     return last_token + 1
+    
 
-# ---------------- ADD PATIENT ----------------
+# ADD PATIENT 
 @app.route('/add', methods=['POST'])
 def add_patient():
 
@@ -214,7 +213,7 @@ def add_patient():
     return redirect('/')
 
 
-# ---------------- MAKE CALL ----------------
+# MAKE CALL 
 def make_call(phone, name):
     client = Client(
         os.getenv("TWILIO_ACCOUNT_SID"),
@@ -240,7 +239,7 @@ def make_call(phone, name):
     print("📞 CALL:", name)
 
 
-# ---------------- AUTO CONTROL ----------------
+# AUTO CONTROL
 @app.route('/start_auto')
 def start_auto():
     global auto_running
@@ -257,7 +256,7 @@ def stop_auto():
     return "stopped"
 
 
-# ---------------- AUTO CALL LOGIC ----------------
+# AUTO CALL LOGIC 
 @app.route('/auto_call')
 def auto_call():
     global current_token
@@ -267,7 +266,7 @@ def auto_call():
 
     now = time.time()
 
-    # 👉 current patient
+    #  current patient
     current = None
     for p in patients:
         if p["token"] == current_token:
@@ -312,7 +311,7 @@ def auto_call():
     return "waiting"
 
 
-# ---------------- WEBHOOK ----------------
+#  WEBHOOK 
 
 @app.route('/call_status', methods=['POST'])
 def call_status():
@@ -369,51 +368,53 @@ def call_status():
     return "ok"
            
 
-# ---------------- MANUAL CALL ----------------
+# MANUAL CALL
 @app.route('/call_now/<int:token>')
 def call_now(token):
-    global patients, current_token
+    global current_token
 
-    for p in patients:
-        if p["token"] == token:
+    conn = sqlite3.connect("database.db")
+    c = conn.cursor()
 
-            make_call(p["phone"], p["name"])
+    c.execute("""
+    SELECT name, phone, token
+    FROM patients
+    WHERE token = ? AND user_id = ?
+    """, (token, session["user_id"]))
 
-            p["called"] = True
-            p["retry_done"] = False
-            p["answered"] = False
-            p["last_called_time"] = time.time()
+    patient = c.fetchone()
+    conn.close()
 
-            current_token = p["token"]
+    if patient:
+        name = patient[0]
+        phone = patient[1]
+        current_token = patient[2]
 
-            print("📞 MANUAL CALL:", p["name"])
-            return redirect('/')
+        make_call(phone, name)
+
+        print("📞 MANUAL CALL:", name)
+        return redirect('/')
 
     return "Patient not found"
     
-# ---------------- DELETE ----------------
-
+    
+# DELETE 
 @app.route('/delete/<int:token>')
 def delete_patient(token):
-    global patients, current_token
+    conn = sqlite3.connect("database.db")
+    c = conn.cursor()
 
-    try:
-        new_list = []
-        for p in patients:
-            if int(p['token']) != int(token):
-                new_list.append(p)
+    c.execute("""
+    DELETE FROM patients
+    WHERE token = ? AND user_id = ?
+    """, (token, session["user_id"]))
 
-        patients = new_list
+    conn.commit()
+    conn.close()
 
-        if len(patients) == 0:
-            current_token = 0
-
-        print("DELETED TOKEN:", token)
-        return redirect('/')
-
-    except Exception as e:
-        print("DELETE ERROR:", str(e))
-        return "Error deleting patient"
+    print("DELETED TOKEN:", token)
+    return redirect('/')
+    
 
 # ---------------- RUN ----------------
 if __name__ == '__main__':
