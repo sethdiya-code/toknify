@@ -95,16 +95,11 @@ def login():
 
 # ---------------- HOME ------------
 
-@app.route('/', methods=['GET', 'POST'])  # 🔥 UPDATED
+@app.route('/', methods=['GET', 'POST'])
 def index():
 
     if "user_id" not in session:
         return redirect('/login')
-
-   
-
- # 🔥 ADDED PROTECTION
-    
 
     conn = sqlite3.connect("database.db")
     c = conn.cursor()
@@ -115,21 +110,21 @@ def index():
     WHERE user_id = ?
     """, (session["user_id"],))
 
-rows = c.fetchall()
+    rows = c.fetchall()
 
-patients = []
+    patients = []
 
-for row in rows:
-    patients.append({
-        "name": row[0],
-        "phone": row[1],
-        "token": row[2],
-        "called": False,
-        "completed": False,
-        "answered": False,
-        "retry_done": False,
-        "last_called_time": 0
-     })
+    for row in rows:
+        patients.append({
+            "name": row[0],
+            "phone": row[1],
+            "token": row[2],
+            "called": False,
+            "completed": False,
+            "answered": False,
+            "retry_done": False,
+            "last_called_time": 0
+        })
 
     conn.close()
 
@@ -148,7 +143,7 @@ for row in rows:
         completed=completed,
         calling=calling,
         waiting=waiting
-   )
+    )
 
    
 # 🔥 ADDED LOGOUT
