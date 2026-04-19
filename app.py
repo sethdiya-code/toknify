@@ -9,7 +9,7 @@ call_logs= []
 app = Flask(__name__)
 app.secret_key= "secret123"
 
-patients = []
+patients=[]
 current_token = 0
 auto_running = False
 call_before= 2
@@ -101,26 +101,9 @@ def index():
     if "user_id" not in session:
         return redirect('/login')
 
-    # 🔥 ADDED LOGIN LOGIC
-    if request.method == "POST":
-        email = request.form['email']
-        password = request.form['password']
+   
 
-        conn = sqlite3.connect("database.db")
-        c = conn.cursor()
-
-        c.execute("SELECT * FROM users WHERE email=? AND password=?", (email, password))
-        user = c.fetchone()
-
-        conn.close()
-
-        if user:
-            session["user_id"] = user[0]
-            return redirect('/')
-        else:
-            return "Invalid login"
-
-    # 🔥 ADDED PROTECTION
+ # 🔥 ADDED PROTECTION
     if "user_id" not in session:
         return render_template('/login')
 
@@ -176,6 +159,9 @@ def set_call_before(value):
 # ---------------- ADD PATIENT ----------------
 @app.route('/add', methods=['POST'])
 def add_patient():
+
+    if "user_id" not in session:
+        return redirect('/login')
     name = request.form['name']
     phone = request.form['phone']
 
