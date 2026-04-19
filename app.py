@@ -104,8 +104,7 @@ def index():
    
 
  # 🔥 ADDED PROTECTION
-    if "user_id" not in session:
-        return render_template('/login')
+    
 
     conn = sqlite3.connect("database.db")
     c = conn.cursor()
@@ -155,6 +154,25 @@ def set_call_before(value):
     print("CALL BEFORE SET:", call_before)
 
     return "ok"
+
+def get_next_token():
+    conn = sqlite3.connect("database.db")
+    c = conn.cursor()
+
+    c.execute("""
+        SELECT MAX(token)
+        FROM patients
+        WHERE user_id = ?
+    """, (session["user_id"],))
+
+    last_token = c.fetchone()[0]
+
+    conn.close()
+
+    if last_token is None:
+        return 1
+
+    return last_token + 1
 
 # ---------------- ADD PATIENT ----------------
 @app.route('/add', methods=['POST'])
