@@ -264,49 +264,31 @@ def auto_call():
     if not auto_running:
         return "stopped"
 
-    now = time.time()
+    conn = sqlite3.connect("database.db")
+    c = conn.cursor()
 
-    #  current patient
-    current = None
-    for p in patients:
-        if p["token"] == current_token:
-            current = p
-            break
+    c.execute("""
+    SELECT name, phone, token
+    FROM patients
+    WHERE user_id = ?
+    AND token > ?
+    ORDER BY token ASC
+    LIMIT 1
+    """, (session["user_id"], current_token))
 
-    # ---------------- FIRST CALL ----------------
-    if current_token == 0:
-        for p in patients:
-            if not p["completed"]:
-                make_call(p["phone"], p["name"])
-                p["called"] = True
-                p["last_called_time"] = now
-                p["retry_done"]= False
-                p["answered"]= False
-                current_token = p["token"]
-                print("NEXT CALL:", p["name"])
-                return "next"
+    patient = c.fetchone()
+    conn.close()
 
-    # ---------------- RETRY ----------------
-    if current and not current["retry_done"] and not current["answered"]:
-        if now - current["last_called_time"] > 50:
-            make_call(current["phone"], current["name"])
-            current["retry_done"] = True
-            current["last_called_time"] = now
-            print("RETRY:", current["name"])
-            return "retry"
+    if patient:
+        name = patient[0]
+        phone = patient[1]
+        token = patient[2]
 
-    # ---------------- NEXT PATIENT ----------------
-    if current and current["completed"]:
-        for p in patients:
-            diff= p["token"]-current_token
+        make_call(phone, name)
+        current_token = token
 
-            if not p["completed"] and not p["called"] and diff== call_before:
-                make_call(p["phone"], p["name"])
-                p["called"] = True
-                p["last_called_time"] = now
-                current_token = p["token"]
-                print("NEXT CALL:", p["name"])
-                return "next"
+        print("📞 AUTO CALL:", name)
+        return "next"
 
     return "waiting"
 
