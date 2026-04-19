@@ -436,6 +436,63 @@ def call_status():
 
     return "ok"
 
+# ---------------- TODAY REPORT ----------------
+@app.route('/today_report')
+def today_report():
+    if 'user_id' not in session:
+        return redirect('/login')
+
+    patients = get_patients(session['user_id'])
+    total = len(patients)
+    completed = len([p for p in patients if p['completed']])
+    waiting = total - completed
+
+    return render_template(
+        'today_report.html',
+        total=total,
+        completed=completed,
+        waiting=waiting,
+        call_logs=call_logs
+    )
+
+
+# ---------------- CALL HISTORY ----------------
+@app.route('/call_history')
+def call_history():
+    if 'user_id' not in session:
+        return redirect('/login')
+
+    return render_template(
+        'call_history.html',
+        call_logs=call_logs
+    )
+
+
+# ---------------- PATIENT RECORDS ----------------
+@app.route('/patient_records')
+def patient_records():
+    if 'user_id' not in session:
+        return redirect('/login')
+
+    patients = get_patients(session['user_id'])
+
+    return render_template(
+        'patient_records.html',
+        patients=patients
+    )
+
+
+# ---------------- TOKEN SETTINGS ----------------
+@app.route('/token_settings')
+def token_settings():
+    if 'user_id' not in session:
+        return redirect('/login')
+
+    return render_template(
+        'token_settings.html',
+        call_before=call_before
+    )
+
 
 if __name__ == '__main__':
     app.run(debug=True)
