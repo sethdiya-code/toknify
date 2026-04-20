@@ -229,7 +229,7 @@ def edit_profile():
     c = conn.cursor()
 
     # current logged in user
-    email = session['user_email']
+    email = session['email']
 
     if request.method == 'POST':
         organization_name = request.form['organization_name']
@@ -248,7 +248,7 @@ def edit_profile():
         # session bhi update hoga
         session['organization_name'] = organization_name
         session['admin_name'] = admin_name
-        session['user_email'] = new_email
+        session['email'] = new_email
 
         conn.close()
         return redirect('/')
