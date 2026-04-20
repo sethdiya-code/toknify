@@ -1,448 +1,348 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Toknify Dashboard</title>
 
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #f5f7fb;
-            padding: 20px;
             margin: 0;
+            padding: 0;
+            background: #f5f6fa;
+            font-family: Arial, sans-serif;
         }
 
         .container {
-            max-width: 1100px;
-            margin: auto;
+            width: 95%;
+            max-width: 1200px;
+            margin: 30px auto;
         }
 
-        /* ================= NAVBAR ================= */
-
-        .top-navbar {
+        .topbar {
             background: white;
-            border-radius: 16px;
-            padding: 18px 25px;
+            padding: 20px;
+            border-radius: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: #5b2be0;
         }
 
-        .main-logo {
-            width: 55px;
-            height: 55px;
-            object-fit: contain;
-        }
-
-        .brand-text h2 {
-            margin: 0;
-            font-size: 24px;
-            color: #4b2aad;
-            font-weight: 700;
-        }
-
-        .brand-text p {
-            margin: 3px 0 0;
-            font-size: 13px;
-            color: #777;
-        }
-
-        /* ================= PROFILE DROPDOWN ================= */
-
-        .profile-dropdown {
+        .profile {
             position: relative;
         }
 
-        .profile-btn {
-            background: #f4f0ff;
+        .profile button {
+            background: #eee9ff;
             border: none;
-            padding: 12px 18px;
-            border-radius: 12px;
+            padding: 10px 18px;
+            border-radius: 10px;
             cursor: pointer;
-            font-weight: 600;
-            color: #4b2aad;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 15px;
+            font-weight: bold;
         }
 
-        .profile-btn:hover {
-            background: #ece5ff;
-        }
-
-        .dropdown-content {
-            display: none;
+        .dropdown {
             position: absolute;
             right: 0;
-            top: 60px;
+            top: 55px;
             width: 280px;
             background: white;
             border-radius: 14px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-            padding: 18px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            display: none;
             z-index: 999;
         }
 
-        .dropdown-content a {
+        .dropdown a {
             display: block;
-            padding: 10px 0;
             text-decoration: none;
-            color: #333;
-            font-size: 14px;
+            color: #222;
+            padding: 10px 0;
+            font-size: 15px;
         }
 
-        .dropdown-content a:hover {
-            color: #4b2aad;
-        }
-
-        .dropdown-section p {
-            margin: 6px 0;
-            font-size: 14px;
-        }
-
-        .logout-link {
-            color: #d62828 !important;
-            font-weight: 600;
-        }
-
-        hr {
+        .dropdown hr {
             border: none;
             border-top: 1px solid #eee;
-            margin: 12px 0;
+            margin: 14px 0;
         }
 
-        /* ================= CARDS ================= */
-
-        .card {
+        .section {
             background: white;
-            padding: 22px;
+            margin-top: 20px;
+            padding: 25px;
             border-radius: 14px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.06);
-            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
-        .card h3 {
+        h2 {
             margin-top: 0;
-            color: #222;
         }
 
         input {
             padding: 12px;
-            margin: 5px;
-            border-radius: 10px;
+            width: 220px;
             border: 1px solid #ddd;
-            outline: none;
+            border-radius: 10px;
+            margin-right: 10px;
         }
 
-        button {
-            padding: 11px 18px;
+        .btn {
+            background: linear-gradient(to right, #4a4dff, #7a2be2);
+            color: white;
             border: none;
+            padding: 12px 22px;
             border-radius: 10px;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: bold;
         }
 
-        .btn-green {
-            background: #6f42c1;
-            color: white;
-        }
-
-        .btn-red {
-            background: #8e44ad;
-            color: white;
-        }
-
-        .btn-blue {
-            background: #4b2aad;
-            color: white;
-        }
-
-        /* ================= STATS ================= */
-
-        .stats-wrap {
+        .token-buttons {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
-        .stats-card {
-            flex: 1;
-            min-width: 140px;
-            text-align: center;
-            padding: 18px;
-            border-radius: 14px;
-            background: #faf7ff;
-            font-weight: 600;
-        }
-
-        .big-number {
-            font-size: 28px;
-            margin-top: 8px;
-            color: #4b2aad;
-        }
-
-        /* ================= TOKEN BOX ================= */
-
-        .token-grid {
-            display: flex;
-            gap: 12px;
-            margin-top: 12px;
+        .token-buttons a {
+            text-decoration: none;
         }
 
         .token-box {
-            flex: 1;
-            text-align: center;
-            padding: 15px;
+            background: #f2edff;
+            padding: 14px 24px;
             border-radius: 12px;
-            background: #f4f0ff;
-            cursor: pointer;
             font-weight: bold;
-            transition: 0.3s;
+            min-width: 70px;
+            text-align: center;
+            color: #5b2be0;
         }
 
-        .token-box:hover {
-            transform: scale(1.03);
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+            gap: 15px;
         }
 
-        .active-token {
-            background: #4b2aad;
-            color: white;
+        .card {
+            background: #f8f7ff;
+            padding: 20px;
+            border-radius: 14px;
+            text-align: center;
         }
 
-        /* ================= PATIENTS ================= */
+        .card h3 {
+            margin: 0;
+            font-size: 28px;
+            color: #5b2be0;
+        }
 
         .patient {
+            background: #fafafa;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 14px 0;
-            border-bottom: 1px solid #eee;
         }
 
-        .status {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 14px;
+        .actions a {
+            text-decoration: none;
+            margin-left: 10px;
         }
 
-        .waiting {
-            background: #f3e8ff;
+        .call-btn {
+            background: #4a4dff;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 10px;
         }
 
-        .calling {
-            background: #e9d8fd;
+        .remove-btn {
+            background: #7a2be2;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 10px;
         }
 
-        .done {
-            background: #ddd6fe;
+        .current-token {
+            text-align: center;
+            font-size: 52px;
+            font-weight: bold;
+            color: #2536b8;
         }
     </style>
-
-    <script>
-        function setCallBefore(value) {
-            fetch('/set_call_before/' + value)
-            .then(() => location.reload());
-        }
-
-        function toggleDropdown() {
-            const menu = document.getElementById("dropdownMenu");
-
-            if (menu.style.display === "block") {
-                menu.style.display = "none";
-            } else {
-                menu.style.display = "block";
-            }
-        }
-
-        setInterval(() => {
-            fetch('/auto_call');
-        }, 5000);
-    </script>
 </head>
-
 <body>
 
 <div class="container">
 
-    <!-- ================= NAVBAR ================= -->
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <div class="logo">Toknify Dashboard</div>
 
-    <div class="top-navbar">
-
-        <div class="nav-left">
-            <img src="/static/logo.png" class="main-logo">
-
-            <div class="brand-text">
-                <h2>Toknify Dashboard</h2>
-                
-            </div>
-        </div>
-
-        <div class="profile-dropdown">
-
-            <button class="profile-btn" onclick="toggleDropdown()">
-                👤
-                <span>{{ session['organization_name'] }}</span>
-                ▼
+        <div class="profile">
+            <button onclick="toggleDropdown()">
+                👤 {{ admin_name }}
             </button>
 
-            <div id="dropdownMenu" class="dropdown-content">
-
-                <div class="dropdown-section">
-                    <p><b>🏥 Organization:</b> {{ session['organization_name'] }}</p>
-                    <p><b>👤 Admin:</b> {{ session['admin_name'] }}</p>
-                    <p><b>📧 Email:</b> {{ session['user_email'] }}</p>
-                </div>
+            <div class="dropdown" id="dropdownMenu">
+                <p><strong>🏥 Organization:</strong> {{ organization }}</p>
+                <p><strong>👤 Admin:</strong> {{ admin_name }}</p>
+                <p><strong>📧 Email:</strong> {{ email }}</p>
 
                 <hr>
 
-                <a href="/">📊 Today’s Report</a>
-                <a href="/">📞 Call History</a>
-                <a href="/">📁 Patient Records</a>
+                <a href="/today_report">📊 Today's Report</a>
+                <a href="/call_history">📞 Call History</a>
+                <a href="/patient_records">📁 Patient Records</a>
+                <a href="/edit_profile">✏ Edit Profile</a>
 
                 <hr>
 
-                <a href="/signup">✏ Edit Profile</a>
-                <a href="/">⚙ Token Settings</a>
-
-                <hr>
-
-                <a href="/logout" class="logout-link">🚪 Logout</a>
-
+                <a href="/logout">🚪 Logout</a>
             </div>
-
         </div>
-
     </div>
 
-    <!-- ================= ADD PATIENT ================= -->
 
-    <div class="card">
-        <h3>Add Patient</h3>
+    <!-- ADD PATIENT -->
+    <div class="section">
+        <h2>Add Patient</h2>
 
-        <form action="/add" method="POST">
+        <form method="POST">
             <input type="text" name="name" placeholder="Patient Name" required>
             <input type="text" name="phone" placeholder="Phone Number" required>
-            <button type="submit" class="btn-blue">Add</button>
+            <button class="btn" type="submit">Add</button>
         </form>
     </div>
 
-    <!-- ================= AUTO CALL ================= -->
 
-    <div class="card">
-        <h3>Auto Call Control</h3>
+    <!-- AUTO CALL -->
+    <div class="section">
+        <h2>Auto Call Control</h2>
 
-        <div style="display:flex; gap:10px;">
-            <a href="/start_auto" style="flex:1;">
-                <button class="btn-green" style="width:100%;">Start Auto Call</button>
-            </a>
+        <a href="/start_auto">
+            <button class="btn">Start Auto Call</button>
+        </a>
 
-            <a href="/stop_auto" style="flex:1;">
-                <button class="btn-red" style="width:100%;">Stop</button>
-            </a>
+        <a href="/stop_auto">
+            <button class="btn">Stop Auto Call</button>
+        </a>
+    </div>
+
+
+    <!-- CALL BEFORE TOKENS -->
+    <div class="section">
+        <h2>Call Before Tokens</h2>
+
+        <div class="token-buttons">
+            <a href="/set_call_before/1"><div class="token-box">1</div></a>
+            <a href="/set_call_before/2"><div class="token-box">2</div></a>
+            <a href="/set_call_before/3"><div class="token-box">3</div></a>
+            <a href="/set_call_before/4"><div class="token-box">4</div></a>
+        </div>
+
+        <p><strong>Current:</strong> {{ call_before }} tokens before</p>
+    </div>
+
+
+    <!-- ADMIN DASHBOARD -->
+    <div class="section">
+        <h2>Admin Dashboard</h2>
+
+        <div class="stats">
+            <div class="card">
+                <p>Total Patients</p>
+                <h3>{{ total }}</h3>
+            </div>
+
+            <div class="card">
+                <p>Completed</p>
+                <h3>{{ completed }}</h3>
+            </div>
+
+            <div class="card">
+                <p>Calling</p>
+                <h3>{{ calling }}</h3>
+            </div>
+
+            <div class="card">
+                <p>Waiting</p>
+                <h3>{{ waiting }}</h3>
+            </div>
         </div>
     </div>
 
-    <!-- ================= CALL BEFORE ================= -->
 
-    <div class="card">
-        <h3>Call Before Tokens</h3>
-
-        <div class="token-grid">
-            <div onclick="setCallBefore(1)" class="token-box {{ 'active-token' if call_before==1 else '' }}">1</div>
-            <div onclick="setCallBefore(2)" class="token-box {{ 'active-token' if call_before==2 else '' }}">2</div>
-            <div onclick="setCallBefore(3)" class="token-box {{ 'active-token' if call_before==3 else '' }}">3</div>
-            <div onclick="setCallBefore(4)" class="token-box {{ 'active-token' if call_before==4 else '' }}">4</div>
-        </div>
-
-        <p>Current: <b>{{ call_before }}</b> tokens before</p>
-    </div>
-
-    <!-- ================= ADMIN DASHBOARD ================= -->
-
-    <div class="card">
-        <h3>Admin Dashboard</h3>
-
-        <div class="stats-wrap">
-
-            <div class="stats-card">
-                Total Patients
-                <div class="big-number">{{ total }}</div>
-            </div>
-
-            <div class="stats-card">
-                Completed
-                <div class="big-number">{{ completed }}</div>
-            </div>
-
-            <div class="stats-card">
-                Calling
-                <div class="big-number">{{ calling }}</div>
-            </div>
-
-            <div class="stats-card">
-                Waiting
-                <div class="big-number">{{ waiting }}</div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- ================= CURRENT TOKEN ================= -->
-
-    <div class="card" style="text-align:center;">
-        <h3>Current Token</h3>
-
-        <div style="font-size:50px; font-weight:700; color:#4b2aad;">
+    <!-- CURRENT TOKEN -->
+    <div class="section">
+        <h2 style="text-align:center;">Current Token</h2>
+        <div class="current-token">
             {{ current_token }}
         </div>
     </div>
 
-    <!-- ================= PATIENTS ================= -->
 
-    <div class="card">
-        <h3>Patients</h3>
+    <!-- PATIENTS -->
+    <div class="section">
+        <h2>Patients</h2>
 
-        {% for p in patients %}
+        {% for patient in patients %}
         <div class="patient">
 
             <div>
-                <b>{{ p.name }}</b>
-                (Token {{ p.token }})
+                <strong>{{ patient.name }}</strong><br>
+                {{ patient.phone }}<br>
+                (Token {{ patient.token }})
             </div>
 
-            <div>
-                {% if p.completed %}
-                    <span class="status done">Done</span>
-                {% elif p.called %}
-                    <span class="status calling">Calling</span>
-                {% else %}
-                    <span class="status waiting">Waiting</span>
-                {% endif %}
-            </div>
-
-            <div style="display:flex; gap:10px;">
-                <a href="/call_now/{{ p.token }}">
-                    <button class="btn-green">Call</button>
+            <div class="actions">
+                <a href="/call_now/{{ patient.token }}" class="call-btn">
+                    Call
                 </a>
 
-                <a href="/delete/{{ p.token }}">
-                    <button class="btn-red">Remove</button>
+                <a href="/remove_patient/{{ patient.token }}" class="remove-btn">
+                    Remove
                 </a>
             </div>
 
         </div>
         {% endfor %}
+
     </div>
 
 </div>
+
+
+<script>
+    function toggleDropdown() {
+        let menu = document.getElementById("dropdownMenu");
+
+        if (menu.style.display === "block") {
+            menu.style.display = "none";
+        } else {
+            menu.style.display = "block";
+        }
+    }
+
+    window.onclick = function(event) {
+        if (!event.target.matches('.profile button')) {
+            let dropdown = document.getElementById("dropdownMenu");
+            if (dropdown.style.display === "block") {
+                dropdown.style.display = "none";
+            }
+        }
+    }
+</script>
 
 </body>
 </html>
