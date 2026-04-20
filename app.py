@@ -40,6 +40,7 @@ def init_db():
         user_id INTEGER,
         name TEXT,
         phone TEXT,
+        visit_purpose TEXT,
         token INTEGER,
         called INTEGER DEFAULT 0,
         completed INTEGER DEFAULT 0,
@@ -278,6 +279,7 @@ def add_patient():
     user_id = session['user_id']
     name = request.form['name']
     phone = request.form['phone']
+    visit_purpose= request.form['visit_purpose']
 
     if not phone.startswith('+'):
         phone = '+91' + phone
@@ -287,8 +289,8 @@ def add_patient():
     conn = get_db()
     c = conn.cursor()
     c.execute(
-        "INSERT INTO patients (user_id, name, phone, token) VALUES (?, ?, ?, ?)",
-        (user_id, name, phone, token)
+        "INSERT INTO patients (user_id, name, phone, visit_purpose, token) VALUES (?, ?, ?, ?, ? )",
+        (user_id, name, phone, visit_purpose, token)
     )
     conn.commit()
     conn.close()
