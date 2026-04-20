@@ -266,7 +266,7 @@ def edit_profile():
     user = c.fetchone()
     conn.close()
 
-    if not in user:
+    if not user:
         return "User not found"
 
     return render_template(
