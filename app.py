@@ -225,11 +225,18 @@ def logout():
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 def edit_profile():
+    if 'user_id' not in session:
+        return redirect('/login')
+        
     conn = get_db()
     c = conn.cursor()
 
     # current logged in user
     email = session['email']
+
+    if not in email:
+        conn.close()
+        return redirect('/login')
 
     if request.method == 'POST':
         organization_name = request.form['organization_name']
@@ -255,9 +262,12 @@ def edit_profile():
 
     # GET request → old data show karega
     c.execute("SELECT organization_name, admin_name, email, password FROM users WHERE email = ?", (email,))
+    
     user = c.fetchone()
-
     conn.close()
+
+    if not in user:
+        return "User not found"
 
     return render_template(
         'signup.html',
