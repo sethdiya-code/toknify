@@ -397,6 +397,147 @@ def set_call_before(value):
 
     return redirect('/')
 
+# ================= TODAY REPORT =================
+@app.route('/today_report')
+def today_report():
+    if 'user_id' not in session:
+        return redirect('/login')
+
+    user_id = session['user_id']
+
+    conn = get_db()
+    c = conn.cursor()
+
+    c.execute("SELECT COUNT(*) FROM patients WHERE user_id=?", (user_id,))
+    total = c.fetchone()[0]
+
+    c.execute("SELECT COUNT(*) FROM patients WHERE user_id=? AND completed=1", (user_id,))
+    completed = c.fetchone()[0]
+
+    waiting = total - completed
+
+    conn.close()
+
+    return render_template(
+        "today_report.html",
+        total=total,
+        completed=completed,
+        waiting=waiting
+    )
+
+
+# ================= CALL HISTORY =================
+@app.route('/call_history')
+def call_history():
+    if 'user_id' not in session:
+        return redirect('/login')
+
+    user_id = session['user_id']
+
+    conn = get_db()
+    c = conn.cursor()
+
+    c.execute("""
+        SELECT patient_name, phone, token, call_type, call_status, created_at
+        FROM call_logs
+        WHERE user_id=?
+        ORDER BY id DESC
+    """, (user_id,))
+
+    history = c.fetchall()
+    conn.close()
+
+    return render_template("call_history.html", history=history)
+
+
+# ================= PATIENT RECORDS =================
+@app.route('/patient_records')
+def patient_records():
+    if 'user_id' not in session:
+        return redirect('/login')
+
+    user_id = session['user_id']
+
+    conn = get_db()
+    c = conn.cursor()
+
+    c.execute("""
+        SELECT name, phone, token, called, completed
+        FROM patients
+        WHERE user_id=?
+        ORDER BY token ASC
+    """, (user_id,))
+
+    patients = c.fetchall()
+    conn.close()
+
+    return render_template("patient_records.html", patients=patients)
+
+
+# ================= NOTIFICATIONS =================
+@app.route('/notifications')
+def notifications():
+    if 'user_id' not in session:
+        return redirect('/login')
+
+    user_id = session['user_id']
+
+    conn = get_db()
+    c = conn.cursor()
+
+    c.execute("""
+        SELECT message, created_at
+        FROM notifications
+        WHERE user_id=?
+        ORDER BY id DESC
+    """, (user_id,))
+
+    notifications = c.fetchall()
+    conn.close()
+
+    return render_template("notifications.html", notifications=notifications)
+
+
+# ================= SUPPORT =================
+@app.route('/support', methods=['GET', 'POST'])
+def support():
+    if 'user_id' not in session:
+        return redirect('/login')
+
+    user_id = session['user_id']
+
+    if request.method == 'POST':
+        subject = request.form['subject']
+        message = request.form['message']
+
+        conn = get_db()
+        c = conn.cursor()
+
+        c.execute("""
+            INSERT INTO support_tickets (user_id, subject, message)
+            VALUES (?, ?, ?)
+        """, (user_id, subject, message))
+
+        conn.commit()
+        conn.close()
+
+        return redirect('/support')
+
+    conn = get_db()
+    c = conn.cursor()
+
+    c.execute("""
+        SELECT subject, message, status, created_at
+        FROM support_tickets
+        WHERE user_id=?
+        ORDER BY id DESC
+    """, (user_id,))
+
+    tickets = c.fetchall()
+    conn.close()
+
+    return render_template("support.html", tickets=tickets)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
