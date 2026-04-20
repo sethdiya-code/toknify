@@ -1,47 +1,98 @@
 from flask import Flask, render_template, request, redirect, session
 from twilio.rest import Client
+import sqlite3
 import os
 import time
-import sqlite3
 
 app = Flask(__name__)
 app.secret_key = "secret123"
 
-call_logs = []
-current_token = 0
-auto_running = False
-call_before = 2
-
 TWILIO_NUMBER = "+17625258609"
 
+auto_running = False
+current_token = 0
 
-# ---------------- DATABASE ----------------
+
+# ================= DATABASE =================
+def get_db():
+    return sqlite3.connect("database.db")
+
+
 def init_db():
-    conn = sqlite3.connect("database.db")
+    conn = get_db()
     c = conn.cursor()
 
+    # USERS
     c.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT,
+        email TEXT UNIQUE,
         password TEXT,
         admin_name TEXT,
         organization_name TEXT
     )
     """)
 
+    # PATIENTS
     c.execute("""
     CREATE TABLE IF NOT EXISTS patients (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
         name TEXT,
         phone TEXT,
         token INTEGER,
-        user_id INTEGER,
         called INTEGER DEFAULT 0,
         completed INTEGER DEFAULT 0,
         answered INTEGER DEFAULT 0,
         retry_done INTEGER DEFAULT 0,
         last_called_time REAL DEFAULT 0
+    )
+    """)
+
+    # CALL HISTORY
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS call_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        patient_name TEXT,
+        phone TEXT,
+        token INTEGER,
+        call_type TEXT,
+        call_status TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    # NOTIFICATIONS
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS notifications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        message TEXT,
+        is_read INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    # SUPPORT
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS support_tickets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        subject TEXT,
+        message TEXT,
+        status TEXT DEFAULT 'open',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    # TOKEN SETTINGS
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS token_settings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        call_before INTEGER DEFAULT 2,
+        auto_call_enabled INTEGER DEFAULT 0
     )
     """)
 
@@ -52,78 +103,63 @@ def init_db():
 init_db()
 
 
-def get_db():
-    return sqlite3.connect("database.db")
+# ================= HELPERS =================
+def get_call_before(user_id):
+    conn = get_db()
+    c = conn.cursor()
+
+    c.execute("SELECT call_before FROM token_settings WHERE user_id=?", (user_id,))
+    row = c.fetchone()
+
+    conn.close()
+
+    if row:
+        return row[0]
+    return 2
 
 
 def get_next_token(user_id):
     conn = get_db()
     c = conn.cursor()
 
-    c.execute("SELECT MAX(token) FROM patients WHERE user_id = ?", (user_id,))
-    last = c.fetchone()[0]
+    c.execute("SELECT MAX(token) FROM patients WHERE user_id=?", (user_id,))
+    row = c.fetchone()[0]
 
     conn.close()
 
-    if last is None:
+    if row is None:
         return 1
-    return last + 1
+    return row + 1
 
 
-def get_patients(user_id):
+def save_notification(user_id, message):
     conn = get_db()
     c = conn.cursor()
 
-    c.execute("""
-    SELECT name, phone, token, called, completed, answered, retry_done, last_called_time
-    FROM patients
-    WHERE user_id = ?
-    ORDER BY token ASC
-    """, (user_id,))
-
-    rows = c.fetchall()
-    conn.close()
-
-    patients = []
-    for row in rows:
-        patients.append({
-            "name": row[0],
-            "phone": row[1],
-            "token": row[2],
-            "called": bool(row[3]),
-            "completed": bool(row[4]),
-            "answered": bool(row[5]),
-            "retry_done": bool(row[6]),
-            "last_called_time": row[7] or 0
-        })
-
-    return patients
-
-
-def update_patient(token, user_id, **kwargs):
-    if not kwargs:
-        return
-
-    conn = get_db()
-    c = conn.cursor()
-
-    fields = []
-    values = []
-
-    for key, value in kwargs.items():
-        fields.append(f"{key} = ?")
-        values.append(value)
-
-    values.extend([token, user_id])
-
-    query = f"UPDATE patients SET {', '.join(fields)} WHERE token = ? AND user_id = ?"
-    c.execute(query, tuple(values))
+    c.execute(
+        "INSERT INTO notifications (user_id, message) VALUES (?, ?)",
+        (user_id, message)
+    )
 
     conn.commit()
     conn.close()
 
 
-# ---------------- SIGNUP ----------------
+def save_call_log(user_id, name, phone, token, call_type, status):
+    conn = get_db()
+    c = conn.cursor()
+
+    c.execute("""
+    INSERT INTO call_logs
+    (user_id, patient_name, phone, token, call_type, call_status)
+    VALUES (?, ?, ?, ?, ?, ?)
+    """, (user_id, name, phone, token, call_type, status))
+
+    conn.commit()
+    conn.close()
+
+
+# ================= AUTH =================
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
@@ -146,12 +182,8 @@ def signup():
     return render_template('signup.html')
 
 
-# ---------------- LOGIN ----------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if "user_id" in session:
-        return redirect('/')
-
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -159,7 +191,7 @@ def login():
         conn = get_db()
         c = conn.cursor()
         c.execute(
-            "SELECT id, email, admin_name, organization_name FROM users WHERE email = ? AND password = ?",
+            "SELECT id, admin_name, organization_name FROM users WHERE email=? AND password=?",
             (email, password)
         )
         user = c.fetchone()
@@ -167,9 +199,9 @@ def login():
 
         if user:
             session['user_id'] = user[0]
-            session['user_email'] = user[1]
-            session['admin_name'] = user[2]
-            session['organization_name'] = user[3]
+            session['email'] = email
+            session['admin_name'] = user[1]
+            session['organization_name'] = user[2]
             return redirect('/')
 
         return "Invalid login"
@@ -177,68 +209,89 @@ def login():
     return render_template('login.html')
 
 
-# ---------------- LOGOUT ----------------
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect('/login')
 
 
-# ---------------- HOME ----------------
-@app.route('/', methods=['GET', 'POST'])
+# ================= DASHBOARD =================
+@app.route('/')
 def index():
-    global current_token
-
     if 'user_id' not in session:
         return redirect('/login')
 
-    patients = get_patients(session['user_id'])
+    user_id = session['user_id']
+    call_before = get_call_before(user_id)
+
+    conn = get_db()
+    c = conn.cursor()
+
+    c.execute("SELECT name, phone, token, called, completed FROM patients WHERE user_id=? ORDER BY token ASC", (user_id,))
+    rows = c.fetchall()
+
+    patients = []
+    for row in rows:
+        patients.append({
+            'name': row[0],
+            'phone': row[1],
+            'token': row[2],
+            'called': row[3],
+            'completed': row[4]
+        })
 
     total = len(patients)
     completed = len([p for p in patients if p['completed']])
     calling = len([p for p in patients if p['called'] and not p['completed']])
     waiting = total - completed
 
+    conn.close()
+
     return render_template(
         'index.html',
         patients=patients,
-        current_token=current_token,
-        call_before=call_before,
-        call_logs=call_logs,
         total=total,
         completed=completed,
         calling=calling,
-        waiting=waiting
+        waiting=waiting,
+        current_token=current_token,
+        call_before=call_before,
+        admin_name=session.get('admin_name'),
+        organization=session.get('organization_name'),
+        email=session.get('email')
     )
 
 
-# ---------------- ADD PATIENT ----------------
+# ================= ADD PATIENT =================
 @app.route('/add', methods=['POST'])
 def add_patient():
     if 'user_id' not in session:
         return redirect('/login')
 
+    user_id = session['user_id']
     name = request.form['name']
     phone = request.form['phone']
 
     if not phone.startswith('+'):
         phone = '+91' + phone
 
-    token = get_next_token(session['user_id'])
+    token = get_next_token(user_id)
 
     conn = get_db()
     c = conn.cursor()
     c.execute(
-        "INSERT INTO patients (name, phone, token, user_id) VALUES (?, ?, ?, ?)",
-        (name, phone, token, session['user_id'])
+        "INSERT INTO patients (user_id, name, phone, token) VALUES (?, ?, ?, ?)",
+        (user_id, name, phone, token)
     )
     conn.commit()
     conn.close()
 
+    save_notification(user_id, f"Patient {name} added")
+
     return redirect('/')
 
 
-# ---------------- DELETE ----------------
+# ================= DELETE =================
 @app.route('/delete/<int:token>')
 def delete_patient(token):
     if 'user_id' not in session:
@@ -246,14 +299,14 @@ def delete_patient(token):
 
     conn = get_db()
     c = conn.cursor()
-    c.execute("DELETE FROM patients WHERE token = ? AND user_id = ?", (token, session['user_id']))
+    c.execute("DELETE FROM patients WHERE token=? AND user_id=?", (token, session['user_id']))
     conn.commit()
     conn.close()
 
     return redirect('/')
 
 
-# ---------------- TWILIO CALL ----------------
+# ================= TWILIO =================
 def make_call(phone, name):
     client = Client(
         os.getenv("TWILIO_ACCOUNT_SID"),
@@ -269,15 +322,8 @@ def make_call(phone, name):
         status_callback_method="POST"
     )
 
-    call_logs.append({
-        "name": name,
-        "phone": phone,
-        "time": time.strftime("%H:%M:%S"),
-        "status": "Calling"
-    })
 
-
-# ---------------- MANUAL CALL ----------------
+# ================= MANUAL CALL =================
 @app.route('/call_now/<int:token>')
 def call_now(token):
     global current_token
@@ -285,28 +331,35 @@ def call_now(token):
     if 'user_id' not in session:
         return redirect('/login')
 
-    patients = get_patients(session['user_id'])
+    user_id = session['user_id']
 
-    for p in patients:
-        if p['token'] == token:
-            make_call(p['phone'], p['name'])
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("SELECT name, phone FROM patients WHERE token=? AND user_id=?", (token, user_id))
+    row = c.fetchone()
 
-            update_patient(
-                token,
-                session['user_id'],
-                called=1,
-                retry_done=0,
-                answered=0,
-                last_called_time=time.time()
-            )
+    if row:
+        name, phone = row
+        make_call(phone, name)
 
-            current_token = token
-            return redirect('/')
+        c.execute("""
+        UPDATE patients
+        SET called=1, retry_done=0, answered=0, last_called_time=?
+        WHERE token=? AND user_id=?
+        """, (time.time(), token, user_id))
 
+        conn.commit()
+        conn.close()
+
+        current_token = token
+        save_call_log(user_id, name, phone, token, "manual", "Calling")
+        return redirect('/')
+
+    conn.close()
     return "Patient not found"
 
 
-# ---------------- AUTO CONTROL ----------------
+# ================= AUTO START/STOP =================
 @app.route('/start_auto')
 def start_auto():
     global auto_running
@@ -321,165 +374,29 @@ def stop_auto():
     return "stopped"
 
 
-# ---------------- CALL BEFORE ----------------
+
+
+
+# ================= TOKEN SETTING =================
 @app.route('/set_call_before/<int:value>')
 def set_call_before(value):
-    global call_before
-    call_before = value
-    return "ok"
-
-
-# ---------------- AUTO CALL ----------------
-@app.route('/auto_call')
-def auto_call():
-    global current_token
-
-    if 'user_id' not in session:
-        return "login required"
-
-    if not auto_running:
-        return "stopped"
-
-    patients = get_patients(session['user_id'])
-    now = time.time()
-
-    current = None
-    for p in patients:
-        if p['token'] == current_token:
-            current = p
-            break
-
-    # first call
-    if current_token == 0:
-        for p in patients:
-            if not p['completed']:
-                make_call(p['phone'], p['name'])
-                update_patient(
-                    p['token'],
-                    session['user_id'],
-                    called=1,
-                    retry_done=0,
-                    answered=0,
-                    last_called_time=now
-                )
-                current_token = p['token']
-                return "next"
-
-    # retry after 50 sec
-    if current and (not current['retry_done']) and (not current['answered']):
-        if now - current['last_called_time'] > 50:
-            make_call(current['phone'], current['name'])
-            update_patient(
-                current['token'],
-                session['user_id'],
-                retry_done=1,
-                last_called_time=now
-            )
-            return "retry"
-
-    # next patient by token away
-    if current and current['completed']:
-        for p in patients:
-            diff = p['token'] - current_token
-            if (not p['completed']) and (not p['called']) and diff == call_before:
-                make_call(p['phone'], p['name'])
-                update_patient(
-                    p['token'],
-                    session['user_id'],
-                    called=1,
-                    last_called_time=now
-                )
-                current_token = p['token']
-                return "next"
-
-    return "waiting"
-
-
-# ---------------- CALL STATUS ----------------
-@app.route('/call_status', methods=['POST'])
-def call_status():
-    if 'user_id' not in session:
-        return "ok"
-
-    duration = request.form.get("CallDuration")
-    patients = get_patients(session['user_id'])
-
-    for p in patients:
-        if p['token'] == current_token:
-            if duration and int(duration) > 0:
-                update_patient(
-                    p['token'],
-                    session['user_id'],
-                    answered=1,
-                    completed=1,
-                    called=0
-                )
-                return "ok"
-
-            if not p['retry_done']:
-                make_call(p['phone'], p['name'])
-                update_patient(
-                    p['token'],
-                    session['user_id'],
-                    retry_done=1,
-                    last_called_time=time.time()
-                )
-                return "ok"
-
-            update_patient(
-                p['token'],
-                session['user_id'],
-                completed=1,
-                called=0
-            )
-            return "ok"
-
-    return "ok"
-
-# ---------------- TODAY REPORT ----------------
-@app.route('/today_report')
-def today_report():
     if 'user_id' not in session:
         return redirect('/login')
 
-    patients = get_patients(session['user_id'])
-    total = len(patients)
-    completed = len([p for p in patients if p['completed']])
-    waiting = total - completed
+    user_id = session['user_id']
 
-    return render_template(
-        'today_report.html',
-        total=total,
-        completed=completed,
-        waiting=waiting,
-        call_logs=call_logs
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("DELETE FROM token_settings WHERE user_id=?", (user_id,))
+    c.execute(
+        "INSERT INTO token_settings (user_id, call_before) VALUES (?, ?)",
+        (user_id, value)
     )
+    conn.commit()
+    conn.close()
 
+    return redirect('/')
 
-# ---------------- CALL HISTORY ----------------
-@app.route('/call_history')
-def call_history():
-    if 'user_id' not in session:
-        return redirect('/login')
-
-    return render_template(
-        'call_history.html',
-        call_logs=call_logs
-    )
-
-
-# ---------------- PATIENT RECORDS ----------------
-@app.route('/patient_records')
-def patient_records():
-    if 'user_id' not in session:
-        return redirect('/login')
-
-    patients = get_patients(session['user_id'])
-
-    return render_template(
-        'patient_records.html',
-        patients=patients
-    )
 
 if __name__ == '__main__':
     app.run(debug=True)
