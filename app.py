@@ -223,6 +223,52 @@ def logout():
     return redirect('/login')
 
 
+@app.route('/edit_profile', methods=['GET', 'POST'])
+def edit_profile():
+    conn = get_db()
+    c = conn.cursor()
+
+    # current logged in user
+    email = session['user_email']
+
+    if request.method == 'POST':
+        organization_name = request.form['organization_name']
+        admin_name = request.form['admin_name']
+        new_email = request.form['email']
+        password = request.form['password']
+
+        c.execute("""
+            UPDATE users
+            SET organization_name = ?, admin_name = ?, email = ?, password = ?
+            WHERE email = ?
+        """, (organization_name, admin_name, new_email, password, email))
+
+        conn.commit()
+
+        # session bhi update hoga
+        session['organization_name'] = organization_name
+        session['admin_name'] = admin_name
+        session['user_email'] = new_email
+
+        conn.close()
+        return redirect('/')
+
+    # GET request → old data show karega
+    c.execute("SELECT organization_name, admin_name, email, password FROM users WHERE email = ?", (email,))
+    user = c.fetchone()
+
+    conn.close()
+
+    return render_template(
+        'signup.html',
+        edit_mode=True,
+        organization_name=user[0],
+        admin_name=user[1],
+        email=user[2],
+        password=user[3]
+    )
+
+
 # ================= DASHBOARD =================
 @app.route('/')
 def index():
