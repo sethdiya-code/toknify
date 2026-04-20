@@ -91,6 +91,7 @@
         <input
             type="text"
             name="organization_name"
+            value= "{{ organization_name if edit_mode else " }}"
             placeholder="Organization Name"
             required
         >
@@ -99,6 +100,7 @@
         <input
             type="text"
             name="admin_name"
+            value= "{{ admin_name if edit_mode else " }}"
             placeholder="Admin Name"
             required
         >
@@ -107,6 +109,7 @@
         <input
             type="email"
             name="email"
+            value= "{{ email if edit_mode else " }}"
             placeholder="Email Address"
             required
         >
@@ -115,6 +118,7 @@
         <input
             type="password"
             name="password"
+            value= "{{ password if edit_mode else " }}"
             placeholder="Password"
             required
         >
