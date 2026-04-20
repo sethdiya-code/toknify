@@ -1,15 +1,73 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Notifications</title>
+<meta charset="UTF-8">
+<title>Notifications</title>
+<style>
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#f5f7fb;
+}
+
+.container{
+    width:80%;
+    margin:50px auto;
+    background:#fff;
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.05);
+}
+
+h1{
+    color:#1f2d3d;
+    margin-bottom:30px;
+}
+
+.notification-box{
+    background:#f8faff;
+    border:1px solid #e6ecff;
+    padding:20px;
+    border-radius:15px;
+    margin-bottom:15px;
+    font-size:16px;
+}
+
+.back-btn{
+    display:inline-block;
+    margin-top:20px;
+    background:#2457ff;
+    color:white;
+    text-decoration:none;
+    padding:14px 28px;
+    border-radius:12px;
+    font-weight:600;
+}
+
+.back-btn:hover{
+    background:#1747e0;
+}
+</style>
 </head>
 <body>
 
-<h1>🔔 Notifications</h1>
+<div class="container">
+    <h1>🔔 Notifications</h1>
 
-<p>No new notifications.</p>
+    {% if notifications %}
+        {% for note in notifications %}
+            <div class="notification-box">
+                {{ note[0] }}
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="notification-box">
+            No new notifications.
+        </div>
+    {% endif %}
 
-<a href="/">← Back to Dashboard</a>
+    <a href="/" class="back-btn">← Back to Dashboard</a>
+</div>
 
 </body>
 </html>
