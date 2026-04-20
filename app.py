@@ -235,7 +235,7 @@ def index():
     conn = get_db()
     c = conn.cursor()
 
-    c.execute("SELECT name, phone, token, called, completed FROM patients WHERE user_id=? ORDER BY token ASC", (user_id,))
+    c.execute("SELECT name, phone, visit_purpose, token, called, completed FROM patients WHERE user_id=? ORDER BY token ASC", (user_id,))
     rows = c.fetchall()
 
     patients = []
@@ -243,9 +243,10 @@ def index():
         patients.append({
             'name': row[0],
             'phone': row[1],
-            'token': row[2],
-            'called': row[3],
-            'completed': row[4]
+            'visit_purpose': row[2],
+            'token': row[3],
+            'called': row[4],
+            'completed': row[5]
         })
 
     total = len(patients)
