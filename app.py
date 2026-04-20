@@ -481,18 +481,5 @@ def patient_records():
         patients=patients
     )
 
-
-# ---------------- TOKEN SETTINGS ----------------
-@app.route('/token_settings')
-def token_settings():
-    if 'user_id' not in session:
-        return redirect('/login')
-
-    return render_template(
-        'token_settings.html',
-        call_before=call_before
-    )
-
-
 if __name__ == '__main__':
     app.run(debug=True)
