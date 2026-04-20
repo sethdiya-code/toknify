@@ -85,49 +85,49 @@
     <h1>Toknify</h1>
     <p>Create your dashboard account</p>
 
-    <form method="POST">
+    <form action="{% if edit_mode %}/edit_profile{% else %}/signup{% endif %}" method="POST">
 
-        <!-- 🔥 Organization Name -->
-        <input
-            type="text"
-            name="organization_name"
-            value= "{{ organization_name if edit_mode else " }}"
-            placeholder="Organization Name"
-            required
-        >
+    <input
+        type="text"
+        name="organization_name"
+        value="{{ organization_name if edit_mode else '' }}"
+        placeholder="Organization Name"
+        required
+    >
 
-        <!-- 🔥 Admin Name -->
-        <input
-            type="text"
-            name="admin_name"
-            value= "{{ admin_name if edit_mode else " }}"
-            placeholder="Admin Name"
-            required
-        >
+    <input
+        type="text"
+        name="admin_name"
+        value="{{ admin_name if edit_mode else '' }}"
+        placeholder="Admin Name"
+        required
+    >
 
-        <!-- Email -->
-        <input
-            type="email"
-            name="email"
-            value= "{{ email if edit_mode else " }}"
-            placeholder="Email Address"
-            required
-        >
+    <input
+        type="email"
+        name="email"
+        value="{{ email if edit_mode else '' }}"
+        placeholder="Email Address"
+        required
+    >
 
-        <!-- Password -->
-        <input
-            type="password"
-            name="password"
-            value= "{{ password if edit_mode else " }}"
-            placeholder="Password"
-            required
-        >
+    <input
+        type="password"
+        name="password"
+        value="{{ password if edit_mode else '' }}"
+        placeholder="Password"
+        required
+    >
 
-        <button type="submit">
+    <button type="submit">
+        {% if edit_mode %}
+            Update Profile
+        {% else %}
             Create Account
-        </button>
+        {% endif %}
+    </button>
 
-    </form>
+</form>
 
     <div class="login-link">
         Already have account?
