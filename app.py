@@ -160,27 +160,34 @@ def save_call_log(user_id, name, phone, token, call_type, status):
 
 
 # ================= AUTH =================
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        admin_name = request.form['admin_name']
-        organization_name = request.form['organization_name']
+        try:
+            email = request.form['email']
+            password = request.form['password']
+            admin_name = request.form['admin_name']
+            organization_name = request.form['organization_name']
 
-        conn = get_db()
-        c = conn.cursor()
-        c.execute(
-            "INSERT INTO users (email, password, admin_name, organization_name) VALUES (?, ?, ?, ?)",
-            (email, password, admin_name, organization_name)
-        )
-        conn.commit()
-        conn.close()
+            conn = get_db()
+            c = conn.cursor()
 
-        return redirect('/login')
+            c.execute("""
+                INSERT INTO users
+                (email, password, admin_name, organization_name)
+                VALUES (?, ?, ?, ?)
+            """, (email, password, admin_name, organization_name))
+
+            conn.commit()
+            conn.close()
+
+            return redirect('/login')
+
+        except Exception as e:
+            return f"Signup Error: {str(e)}"
 
     return render_template('signup.html')
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
