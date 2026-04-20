@@ -234,7 +234,7 @@ def edit_profile():
     # current logged in user
     email = session['email']
 
-    if not in email:
+    if not email:
         conn.close()
         return redirect('/login')
 
