@@ -430,17 +430,14 @@ def call_now(token):
 def start_auto():
     global auto_running
     auto_running = True
-    return "started"
+    return redirect('/')
 
 
 @app.route('/stop_auto')
 def stop_auto():
     global auto_running
     auto_running = False
-    return "stopped"
-
-
-
+    return redirect('/')
 
 
 # ================= TOKEN SETTING =================
