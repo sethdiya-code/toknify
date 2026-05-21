@@ -245,6 +245,96 @@
             background: #ddd6fe;
            
         }
+
+        #splash-screen{
+    position: fixed;
+    inset: 0;
+    background:
+    linear-gradient(rgba(20,20,40,0.82), rgba(20,20,40,0.82)),
+    url('/logo.png?v=9');
+
+    background-size: cover;
+    background-position: center;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    z-index: 99999;
+
+    animation: splashFade 1s ease forwards;
+    animation-delay: 3s;
+}
+
+.splash-logo{
+    width: 170px;
+    height: 170px;
+    object-fit: contain;
+
+    animation:
+    zoomIn 1.5s ease,
+    glow 2s infinite alternate;
+}
+
+.splash-title{
+    margin-top: 25px;
+    color: white;
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: 2px;
+
+    animation: fadeUp 1.5s ease;
+}
+
+.splash-subtitle{
+    margin-top: 10px;
+    color: rgba(255,255,255,0.75);
+    font-size: 18px;
+
+    animation: fadeUp 2s ease;
+}
+
+@keyframes zoomIn{
+    from{
+        transform: scale(0.4);
+        opacity: 0;
+    }
+
+    to{
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes glow{
+    from{
+        filter: drop-shadow(0 0 5px #4f6fff);
+    }
+
+    to{
+        filter: drop-shadow(0 0 28px #6b7cff);
+    }
+}
+
+@keyframes fadeUp{
+    from{
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to{
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes splashFade{
+    to{
+        opacity: 0;
+        visibility: hidden;
+    }
+}
     </style>
 
     <script>
@@ -270,6 +360,20 @@
 </head>
 
 <body>
+
+<div id="splash-screen">
+
+    <img src="/logo.png?v=9" class="splash-logo">
+
+    <div class="splash-title">
+        TOKNIFY
+    </div>
+
+    <div class="splash-subtitle">
+        Smart Token Calling System
+    </div>
+
+</div>
 
 <div class="container">
 
