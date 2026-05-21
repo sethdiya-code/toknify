@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, semd_from_directory
+from flask import Flask, render_template, request, redirect, session, send_from_directory
 from twilio.rest import Client
 import sqlite3
 import os
