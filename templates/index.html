@@ -243,6 +243,45 @@
 
         .done {
             background: #ddd6fe;
+            #splash-screen{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+    animation: fadeOut 1s ease forwards;
+    animation-delay: 2s;
+}
+
+.splash-logo{
+    width: 120px;
+    margin-bottom: 20px;
+}
+
+#splash-screen h1{
+    font-size: 42px;
+    color: #3b36d0;
+    margin: 0;
+}
+
+#splash-screen p{
+    color: gray;
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+@keyframes fadeOut{
+    to{
+        opacity: 0;
+        visibility: hidden;
+    }
+}
         }
     </style>
 
@@ -269,6 +308,13 @@
 </head>
 
 <body>
+
+<div id="splash-screen">
+    <img src="/logo.png" class="splash-logo">
+
+    <h1>Toknify</h1>
+    <p>Smart Token Calling System</p>
+</div>
 
 <div class="container">
 
