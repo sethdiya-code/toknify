@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, semd_from_directory
 from twilio.rest import Client
 import sqlite3
 import os
 import time
 
 app = Flask(__name__)
+from flask import send_from_directory
 app.secret_key = "secret123"
 
 TWILIO_NUMBER = "+17625258609"
@@ -600,6 +601,10 @@ def support():
     conn.close()
 
     return render_template("support.html", tickets=tickets)
+
+@app.route('/logo.png')
+def logo():
+    return send_from_directory('.', 'logo.png')
 
 
 if __name__ == '__main__':
