@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -77,10 +76,89 @@
             text-decoration: underline;
         }
 
+        #splash-screen{
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #111827, #1e1b4b);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    z-index: 99999;
+
+    animation: splashFade 1s ease forwards;
+    animation-delay: 2.5s;
+}
+
+.splash-logo{
+    width: 170px;
+    height: 170px;
+    object-fit: contain;
+
+    animation:
+    zoomIn 1.8s cubic-bezier(0.22, 1, 0.36, 1),
+    glow 2s infinite alternate;
+}
+
+.splash-title{
+    margin-top: 25px;
+    color: white;
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.splash-subtitle{
+    margin-top: 10px;
+    color: rgba(255,255,255,0.75);
+    font-size: 18px;
+}
+
+@keyframes zoomIn{
+    from{
+        transform: scale(0.4);
+        opacity: 0;
+    }
+
+    to{
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes glow{
+    from{
+        filter: drop-shadow(0 0 5px #4f6fff);
+    }
+
+    to{
+        filter: drop-shadow(0 0 28px #6b7cff);
+    }
+}
+
+@keyframes splashFade{
+    to{
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
     </style>
 </head>
 
 <body>
+
+    <div id="splash-screen">
+
+    <img src="/logo.png?v=20" class="splash-logo">
+
+    <h1>TOKNIFY</h1>
+
+    <p>Smart Token Calling System</p>
+
+</div>
 
     <div class="login-card">
         <h2>🔐 Toknify Login</h2>
