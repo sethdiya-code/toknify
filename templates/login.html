@@ -79,7 +79,7 @@
         #splash-screen{
     position: fixed;
     inset: 0;
-    background: linear gradient( 135deg, #0f172a, #1e1b4b, #4c1d95 );
+    background: linear-gradient( 135deg, #0f172a, #1e1b4b, #4c1d95 );
 
     display: flex;
     justify-content: center;
@@ -91,7 +91,6 @@
     animation: splashFade 1s ease forwards;
     animation-delay: 2.5s;
 }
-
 .splash-logo{
     width: 170px;
     height: 170px;
@@ -101,7 +100,10 @@
         drop-shadow(0 0 15px rgba(139,92,246,0.6))
         drop-shadow(0 0 35px rgba(139,92,246,0.5))
         drop-shadow(0 0 60px rgba(139,92,246,0.4));
+
+    animation: zoomIn 1.8s cubic-bezier(0.22,1,0.36,1);
 }
+
 
     animation:
     zoomIn 1.8s cubic-bezier(0.22, 1, 0.36, 1),
@@ -154,7 +156,7 @@
 
     <h1 style="color:white;">TOKNIFY</h1>
 
-    <p style="color:#rgba(255,255,255,0.8);">Smart Token Calling System</p>
+    <p style="color:rgba(255,255,255,0.8);">Smart Token Calling System</p>
 
 </div>
 
