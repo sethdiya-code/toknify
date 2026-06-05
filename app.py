@@ -462,6 +462,8 @@ def set_call_before(value):
     return redirect('/')
 
 # ================= TODAY REPORT =================
+
+# ================= TODAY REPORT =================
 @app.route('/today_report')
 def today_report():
     if 'user_id' not in session:
@@ -472,28 +474,33 @@ def today_report():
     conn = get_db()
     c = conn.cursor()
 
-    c.execute("SELECT COUNT(*) FROM patients WHERE user_id=?", (user_id,))
+    c.execute(
+        "SELECT COUNT(*) FROM patients WHERE user_id=?",
+        (user_id,)
+    )
     total = c.fetchone()[0]
 
-    c.execute("SELECT COUNT(*) FROM patients WHERE user_id=? AND completed=1", (user_id,))
+    c.execute(
+        "SELECT COUNT(*) FROM patients WHERE user_id=? AND completed=1",
+        (user_id,)
+    )
     completed = c.fetchone()[0]
 
-    c.execute("""
-SELECT COUNT(*)
-FROM patients
-WHERE user_id=? AND called=1 AND completed=0
-""", (user_id,))
-
-missed = c.fetchone()[0]
-
-completion_rate = 0
-missed_rate = 0
-
-if total > 0:
-    completion_rate = round((completed / total) * 100)
-    missed_rate = round((missed / total) * 100)
-
     waiting = total - completed
+
+    c.execute("""
+        SELECT COUNT(*)
+        FROM patients
+        WHERE user_id=? AND called=1 AND completed=0
+    """, (user_id,))
+    missed = c.fetchone()[0]
+
+    completion_rate = 0
+    missed_rate = 0
+
+    if total > 0:
+        completion_rate = round((completed / total) * 100)
+        missed_rate = round((missed / total) * 100)
 
     conn.close()
 
@@ -506,7 +513,6 @@ if total > 0:
         completion_rate=completion_rate,
         missed_rate=missed_rate
     )
-
 
 # ================= CALL HISTORY =================
 @app.route('/call_history')
