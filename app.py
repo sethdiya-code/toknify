@@ -4,6 +4,10 @@ import sqlite3
 import os
 import time
 
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from flask import send_file
+
 app = Flask(__name__)
 from flask import send_from_directory
 app.secret_key = "secret123"
