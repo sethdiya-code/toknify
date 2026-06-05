@@ -466,8 +466,6 @@ def set_call_before(value):
     return redirect('/')
 
 # ================= TODAY REPORT =================
-
-# ================= TODAY REPORT =================
 @app.route('/today_report')
 def today_report():
     if 'user_id' not in session:
@@ -517,6 +515,53 @@ def today_report():
         completion_rate=completion_rate,
         missed_rate=missed_rate
     )
+
+#pdf download
+@app.route('/download_report')
+def download_report():
+    if 'user_id' not in session:
+        return redirect('/login')
+
+    user_id = session['user_id']
+
+    conn = get_db()
+    c = conn.cursor()
+
+    c.execute("SELECT COUNT(*) FROM patients WHERE user_id=?", (user_id,))
+    total = c.fetchone()[0]
+
+    c.execute("SELECT COUNT(*) FROM patients WHERE user_id=? AND completed=1", (user_id,))
+    completed = c.fetchone()[0]
+
+    c.execute("""
+        SELECT COUNT(*)
+        FROM patients
+        WHERE user_id=? AND called=1 AND completed=0
+    """, (user_id,))
+    missed = c.fetchone()[0]
+
+    waiting = total - completed
+
+    conn.close()
+
+    pdf_file = "today_report.pdf"
+
+    doc = SimpleDocTemplate(pdf_file)
+    styles = getSampleStyleSheet()
+
+    content = [
+        Paragraph("TOKNIFY - Today's Report", styles['Title']),
+        Spacer(1, 20),
+
+        Paragraph(f"Total Patients: {total}", styles['Normal']),
+        Paragraph(f"Completed Calls: {completed}", styles['Normal']),
+        Paragraph(f"Waiting Patients: {waiting}", styles['Normal']),
+        Paragraph(f"Missed Calls: {missed}", styles['Normal']),
+    ]
+
+    doc.build(content)
+
+    return send_file(pdf_file, as_attachment=True)
 
 # ================= CALL HISTORY =================
 @app.route('/call_history')
