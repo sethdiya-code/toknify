@@ -478,6 +478,21 @@ def today_report():
     c.execute("SELECT COUNT(*) FROM patients WHERE user_id=? AND completed=1", (user_id,))
     completed = c.fetchone()[0]
 
+    c.execute("""
+SELECT COUNT(*)
+FROM patients
+WHERE user_id=? AND called=1 AND completed=0
+""", (user_id,))
+
+missed = c.fetchone()[0]
+
+completion_rate = 0
+missed_rate = 0
+
+if total > 0:
+    completion_rate = round((completed / total) * 100)
+    missed_rate = round((missed / total) * 100)
+
     waiting = total - completed
 
     conn.close()
@@ -486,7 +501,10 @@ def today_report():
         "today_report.html",
         total=total,
         completed=completed,
-        waiting=waiting
+        waiting=waiting,
+        missed=missed,
+        completion_rate=completion_rate,
+        missed_rate=missed_rate
     )
 
 
