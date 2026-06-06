@@ -170,6 +170,10 @@ def save_call_log(user_id, name, phone, token, call_type, status):
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
+
+    if 'user_id' in session:
+        return redirect('/')
+        
     if request.method == 'POST':
         try:
             email = request.form['email']
@@ -187,10 +191,17 @@ def signup():
             """, (email, password, admin_name, organization_name))
 
             conn.commit()
+            
+            user_id = c.lastrowid
+            session['user_id'] = user_id
+            session['email'] = email
+            session['admin_name'] = admin_name
+            session['organization_name'] = organization_name
+
             conn.close()
 
-            return redirect('/login')
-
+           return redirect('/')
+            
         except Exception as e:
             return f"Signup Error: {str(e)}"
 
@@ -198,6 +209,9 @@ def signup():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+
+    if 'user_id' in session:
+        return redirect('/')
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
