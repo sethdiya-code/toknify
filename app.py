@@ -639,7 +639,7 @@ content.append(
 
 doc.build(content)
 
-    return send_file(pdf_file, as_attachment=True)
+return send_file(pdf_file, as_attachment=True)
 
 # ================= CALL HISTORY =================
 @app.route('/call_history')
