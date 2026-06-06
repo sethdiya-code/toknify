@@ -552,12 +552,10 @@ if total > 0:
 
 conn.close()
 
-    pdf_file = "today_report.pdf"
+pdf_file = "today_report.pdf"
 
-    doc = SimpleDocTemplate(pdf_file)
-    styles = getSampleStyleSheet()
-
-  styles = getSampleStyleSheet()
+doc = SimpleDocTemplate(pdf_file)
+styles = getSampleStyleSheet()
 
 content = []
 
