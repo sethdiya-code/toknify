@@ -1,0 +1,91 @@
+<!DOCTYPE html><html>
+<head>
+    <title>Toknify</title><style>
+    body{
+        margin:0;
+        height:100vh;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        flex-direction:column;
+        background:white;
+        overflow:hidden;
+        font-family:'Segoe UI',sans-serif;
+    }
+
+    .logo{
+        width:180px;
+        height:180px;
+        object-fit:contain;
+
+        animation:
+        zoomIn 1.5s ease,
+        glow 2s infinite alternate;
+    }
+
+    .title{
+        margin-top:20px;
+        font-size:52px;
+        font-weight:800;
+        color:#6f42c1;
+        letter-spacing:3px;
+        animation:fadeUp 1.5s ease;
+    }
+
+    .subtitle{
+        margin-top:10px;
+        font-size:18px;
+        color:#666;
+        animation:fadeUp 2s ease;
+    }
+
+    @keyframes zoomIn{
+        from{
+            transform:scale(0.4);
+            opacity:0;
+        }
+        to{
+            transform:scale(1);
+            opacity:1;
+        }
+    }
+
+    @keyframes glow{
+        from{
+            filter:drop-shadow(0 0 5px #4f6fff);
+        }
+        to{
+            filter:drop-shadow(0 0 25px #6b7cff);
+        }
+    }
+
+    @keyframes fadeUp{
+        from{
+            opacity:0;
+            transform:translateY(30px);
+        }
+        to{
+            opacity:1;
+            transform:translateY(0);
+        }
+    }
+</style>
+
+<script>
+    setTimeout(function(){
+        window.location.href="/login";
+    },3000);
+</script>
+
+</head><body><img src="/logo.png?v=99" class="logo">
+
+<div class="title">
+    TOKNIFY
+</div>
+
+<div class="subtitle">
+    Smart Token Calling System
+</div>
+
+</body>
+</html>
