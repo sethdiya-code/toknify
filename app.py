@@ -179,7 +179,7 @@ def landing():
 def signup():
 
     if 'user_id' in session:
-        return redirect('/')
+        return redirect('/dashboard')
 
     if request.method == 'POST':
         try:
@@ -219,7 +219,7 @@ def signup():
 def login():
 
     if 'user_id' in session:
-        return redirect('/')
+        return redirect('/dashboard')
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
@@ -306,9 +306,11 @@ def edit_profile():
         password=user[3]
     )
 
-
-# ================= DASHBOARD =================
 @app.route('/')
+def home():
+    return redirect('/splash')
+# ================= DASHBOARD =================
+@app.route('/dashboard')
 def index():
     if 'user_id' not in session:
         return redirect('/login')
