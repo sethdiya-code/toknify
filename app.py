@@ -4,7 +4,7 @@ import sqlite3
 import os
 import time
 
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
 from reportlab.lib.styles import getSampleStyleSheet
 from flask import send_file
 from datetime import datetime
@@ -173,7 +173,7 @@ def signup():
 
     if 'user_id' in session:
         return redirect('/')
-        
+
     if request.method == 'POST':
         try:
             email = request.form['email']
@@ -191,8 +191,9 @@ def signup():
             """, (email, password, admin_name, organization_name))
 
             conn.commit()
-            
+
             user_id = c.lastrowid
+
             session['user_id'] = user_id
             session['email'] = email
             session['admin_name'] = admin_name
@@ -200,8 +201,8 @@ def signup():
 
             conn.close()
 
-           return redirect('/')
-            
+            return redirect('/')
+
         except Exception as e:
             return f"Signup Error: {str(e)}"
 
