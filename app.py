@@ -165,7 +165,10 @@ def save_call_log(user_id, name, phone, token, call_type, status):
     conn.commit()
     conn.close()
 
-
+@app.route('/splash')
+def splash():
+    return render_template('splash.html')
+    
 # ================= AUTH =================
 
 @app.route('/signup', methods=['GET', 'POST'])
