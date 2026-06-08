@@ -11,6 +11,9 @@ from datetime import datetime
 
 app = Flask(__name__)
 from flask import send_from_directory
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory('.', 'favicon.ico')
 app.secret_key = "secret123"
 
 TWILIO_NUMBER = "+17625258609"
