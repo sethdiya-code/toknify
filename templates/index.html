@@ -315,7 +315,7 @@
 
                 <a href="/today_report">📊 Today's Report</a>
                 <a href="/call_history">📞 Call History</a>
-                <a href="/patient_records">📁 Patient Records</a>
+                <a href="/patient_records">📁 Customer Records</a>
 
                 <hr>
 
@@ -337,10 +337,10 @@
     <!-- ================= ADD PATIENT ================= -->
 
     <div class="card">
-        <h3>Add Patient</h3>
+        <h3>Add Customer</h3>
 
         <form action="/add" method="POST">
-            <input type="text" name="name" placeholder="Patient Name" required>
+            <input type="text" name="name" placeholder="Customer Name" required>
             <input type="text" name="phone" placeholder="Phone Number" required>
             <input type="text" name="visit_purpose" placeholder="Visit Purpose" required>
             <button type="submit" class="btn-blue">Add</button>
@@ -386,7 +386,7 @@
         <div class="stats-wrap">
 
             <div class="stats-card">
-                Total Patients
+                Total Customers
                 <div class="big-number">{{ total }}</div>
             </div>
 
@@ -421,7 +421,7 @@
     <!-- ================= PATIENTS ================= -->
 
     <div class="card">
-        <h3>Patients</h3>
+        <h3>Customers</h3>
 
         {% for p in patients %}
         <div class="patient">
