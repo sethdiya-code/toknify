@@ -148,10 +148,19 @@ text-align:center;
 }
 
 .step{
-background:white;
-padding:30px;
-border-radius:18px;
-box-shadow:0 10px 30px rgba(0,0,0,.08);
+    background:white;
+    padding:30px;
+    border-radius:18px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+
+    transition:all .3s ease;
+    cursor:pointer;
+}
+
+.step:hover{
+    transform:translateY(-10px);
+
+    box-shadow:0 20px 40px rgba(111,66,193,.25);
 }
 
 .step-number{
