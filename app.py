@@ -213,7 +213,7 @@ def signup():
 
             conn.close()
 
-            return redirect('/')
+            return redirect('/dashboard')
 
         except Exception as e:
             return f"Signup Error: {str(e)}"
@@ -243,7 +243,7 @@ def login():
             session['email'] = email
             session['admin_name'] = user[1]
             session['organization_name'] = user[2]
-            return redirect('/')
+            return redirect('/dashboard')
 
         return "Invalid login"
 
@@ -291,7 +291,7 @@ def edit_profile():
         session['email'] = new_email
 
         conn.close()
-        return redirect('/')
+        return redirect('/dashboard')
 
     # GET request → old data show karega
     c.execute("SELECT organization_name, admin_name, email, password FROM users WHERE email = ?", (email,))
@@ -313,7 +313,12 @@ def edit_profile():
 
 @app.route('/')
 def home():
+
+    if 'user_id' in session:
+        return redirect('/dashboard')
+
     return redirect('/splash')
+    
 # ================= DASHBOARD =================
 @app.route('/dashboard')
 def index():
@@ -389,7 +394,7 @@ def add_patient():
 
     save_notification(user_id, f"Patient {name} added")
 
-    return redirect('/')
+    return redirect('/dashboard')
 
 
 # ================= DELETE =================
@@ -404,7 +409,7 @@ def delete_patient(token):
     conn.commit()
     conn.close()
 
-    return redirect('/')
+    return redirect('/dashboard')
 
 
 # ================= TWILIO =================
@@ -454,7 +459,7 @@ def call_now(token):
 
         current_token = token
         save_call_log(user_id, name, phone, token, "manual", "Calling")
-        return redirect('/')
+        return redirect('/dashboard')
 
     conn.close()
     return "Patient not found"
@@ -465,14 +470,14 @@ def call_now(token):
 def start_auto():
     global auto_running
     auto_running = True
-    return redirect('/')
+    return redirect('/dashboard')
 
 
 @app.route('/stop_auto')
 def stop_auto():
     global auto_running
     auto_running = False
-    return redirect('/')
+    return redirect('/dashboard')
 
 
 # ================= TOKEN SETTING =================
@@ -493,7 +498,7 @@ def set_call_before(value):
     conn.commit()
     conn.close()
 
-    return redirect('/')
+    return redirect('/dashboard')
 
 # ================= TODAY REPORT =================
 @app.route('/today_report')
