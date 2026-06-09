@@ -787,6 +787,30 @@ def notifications():
 
     return render_template("notifications.html", notifications=notifications)
 
+#-----------------RESET DAY----------------
+
+@app.route('/reset_day')
+def reset_day():
+
+    if 'user_id' not in session:
+        return redirect('/login')
+
+    conn = get_db()
+    c = conn.cursor()
+
+    c.execute(
+        "DELETE FROM patients WHERE user_id=?",
+        (session['user_id'],)
+    )
+
+    conn.commit()
+    conn.close()
+
+    global current_token
+    current_token = 0
+
+    return redirect('/dashboard')
+
 
 # ================= SUPPORT =================
 @app.route('/support', methods=['GET', 'POST'])
