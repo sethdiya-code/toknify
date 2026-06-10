@@ -852,6 +852,15 @@ def support():
 
     return render_template("support.html", tickets=tickets)
 
+@app.route('/robots.txt')
+def robots():
+    return send_from_directory('.', 'robots.txt')
+
+
+@app.route('/sitemap.xml')
+def sitemap():
+    return send_from_directory('.', 'sitemap.xml')
+
 @app.route('/logo.png')
 def logo():
     return send_from_directory('.', 'logo.png')
