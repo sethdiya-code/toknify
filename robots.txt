@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://toknify.in/sitemap.xml
