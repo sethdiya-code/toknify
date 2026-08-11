@@ -1,2 +1,0 @@
-# toknify
-token system app
